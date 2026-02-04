@@ -8,6 +8,7 @@ import {
   Switch,
   Alert,
   Linking,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -44,12 +45,21 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     updateSettings({ themeMode: mode });
   };
 
+  // Helper for cross-platform alerts
+  const showAlert = (title: string, message: string) => {
+    if (Platform.OS === 'web') {
+      window.alert(`${title}\n\n${message}`);
+    } else {
+      Alert.alert(title, message);
+    }
+  };
+
   const handleExport = async () => {
     try {
       await exportData(habits, settings);
-      Alert.alert('Success', 'Data exported successfully');
+      showAlert('Success', 'Data exported successfully');
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to export data');
+      showAlert('Error', error.message || 'Failed to export data');
     }
   };
 
@@ -57,51 +67,91 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     try {
       const data = await importData();
       if (data) {
-        Alert.alert(
-          'Import Data',
-          `Found ${data.habits.length} habits. This will replace your current data. Continue?`,
-          [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Import',
-              onPress: async () => {
-                await importHabits(data.habits, data.settings);
-                Alert.alert('Success', 'Data imported successfully');
+        if (Platform.OS === 'web') {
+          const confirmed = window.confirm(
+            `Import Data?\n\nFound ${data.habits.length} habits. This will replace your current data. Continue?`
+          );
+          if (confirmed) {
+            await importHabits(data.habits, data.settings);
+            showAlert('Success', 'Data imported successfully');
+            window.location.reload();
+          }
+        } else {
+          Alert.alert(
+            'Import Data',
+            `Found ${data.habits.length} habits. This will replace your current data. Continue?`,
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Import',
+                onPress: async () => {
+                  await importHabits(data.habits, data.settings);
+                  Alert.alert('Success', 'Data imported successfully');
+                },
               },
-            },
-          ]
-        );
+            ]
+          );
+        }
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to import data. Please check the file format.');
+      showAlert('Error', 'Failed to import data. Please check the file format.');
     }
   };
 
   const handleClearData = () => {
-    Alert.alert(
-      'Clear All Data',
-      'This will permanently delete all your habits and settings. This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Clear',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await clearAllData();
-              await clearAllHabits();
-              Alert.alert('Success', 'All data has been cleared');
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Home' }],
-              });
-            } catch (error) {
-              Alert.alert('Error', 'Failed to clear data');
-            }
+    if (Platform.OS === 'web') {
+      // Web: Use native browser confirm
+      const confirmed = window.confirm(
+        'Clear All Data?\n\nThis will permanently delete all your habits and settings. This action cannot be undone.'
+      );
+      
+      if (confirmed) {
+        (async () => {
+          try {
+            await clearAllHabits();
+            await clearAllData();
+            window.alert('All data has been cleared!');
+            window.location.reload();
+          } catch (error) {
+            console.error('Clear data error:', error);
+            window.alert('Failed to clear data');
+          }
+        })();
+      }
+    } else {
+      // Native: Use React Native Alert
+      Alert.alert(
+        'Clear All Data',
+        'This will permanently delete all your habits and settings. This action cannot be undone.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Clear',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await clearAllHabits();
+                await clearAllData();
+                Alert.alert('Success', 'All data has been cleared!', [
+                  {
+                    text: 'OK',
+                    onPress: () => {
+                      navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'Home' }],
+                      });
+                    },
+                  },
+                ]);
+              } catch (error) {
+                console.error('Clear data error:', error);
+                Alert.alert('Error', 'Failed to clear data');
+              }
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   const SettingRow: React.FC<{

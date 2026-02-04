@@ -16,6 +16,9 @@ Notifications.setNotificationHandler({
 });
 
 export const requestNotificationPermissions = async (): Promise<boolean> => {
+  // Skip on web - notifications not supported
+  if (Platform.OS === 'web') return false;
+  
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
 
@@ -41,6 +44,9 @@ export const requestNotificationPermissions = async (): Promise<boolean> => {
 };
 
 export const scheduleHabitReminder = async (habit: Habit): Promise<string | null> => {
+  // Skip on web - notifications not supported
+  if (Platform.OS === 'web') return null;
+  
   if (!habit.reminderEnabled || !habit.reminderTime) {
     return null;
   }
@@ -69,6 +75,9 @@ export const scheduleHabitReminder = async (habit: Habit): Promise<string | null
 };
 
 export const cancelHabitReminder = async (habitId: string): Promise<void> => {
+  // Skip on web - notifications not supported
+  if (Platform.OS === 'web') return;
+  
   const scheduledNotifications = await Notifications.getAllScheduledNotificationsAsync();
   
   for (const notification of scheduledNotifications) {
@@ -79,9 +88,15 @@ export const cancelHabitReminder = async (habitId: string): Promise<void> => {
 };
 
 export const cancelAllReminders = async (): Promise<void> => {
+  // Skip on web - notifications not supported
+  if (Platform.OS === 'web') return;
+  
   await Notifications.cancelAllScheduledNotificationsAsync();
 };
 
 export const getScheduledNotifications = async () => {
+  // Skip on web - notifications not supported
+  if (Platform.OS === 'web') return [];
+  
   return Notifications.getAllScheduledNotificationsAsync();
 };
