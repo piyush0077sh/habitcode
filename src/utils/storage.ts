@@ -61,17 +61,25 @@ export const exportData = async (
       settings,
     };
 
+    const documentDir = getDocumentDirectory();
+    if (!documentDir) {
+      throw new Error('Document directory not available');
+    }
+
     const fileName = `habitcue-backup-${new Date().toISOString().split('T')[0]}.json`;
-    const filePath = `${getDocumentDirectory()}${fileName}`;
+    const filePath = `${documentDir}${fileName}`;
 
     // @ts-ignore
     await FileSystem.writeAsStringAsync(filePath, JSON.stringify(exportDataObj, null, 2));
 
-    if (await Sharing.isAvailableAsync()) {
+    const isAvailable = await Sharing.isAvailableAsync();
+    if (isAvailable) {
       await Sharing.shareAsync(filePath, {
         mimeType: 'application/json',
         dialogTitle: 'Export HabitCue Data',
       });
+    } else {
+      throw new Error('Sharing is not available on this device');
     }
   } catch (error) {
     console.error('Error exporting data:', error);

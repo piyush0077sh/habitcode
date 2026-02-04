@@ -79,6 +79,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           )}
           <TouchableOpacity
             style={[styles.menuButton, { backgroundColor: colors.surface }]}
+            onPress={() => navigation.navigate('Leaderboard')}
+          >
+            <MaterialIcons name="leaderboard" size={24} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.menuButton, { backgroundColor: colors.surface }]}
             onPress={() => navigation.navigate('Settings')}
           >
             <MaterialIcons name="settings" size={24} color={colors.text} />

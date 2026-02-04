@@ -86,6 +86,9 @@ export const STORAGE_KEYS = {
   HABITS: '@habitcode/habits',
   SETTINGS: '@habitcode/settings',
   THEME: '@habitcode/theme',
+  FRIEND_CODE: '@habitcode/friendCode',
+  DISPLAY_NAME: '@habitcode/displayName',
+  FRIENDS: '@habitcode/friends',
 };
 
 export const APP_VERSION = '1.0.0';

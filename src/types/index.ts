@@ -76,3 +76,32 @@ export interface ExportData {
   habits: Habit[];
   settings: AppSettings;
 }
+
+// Leaderboard Types
+export interface UserStats {
+  friendCode: string;
+  displayName: string;
+  totalCompletions: number;
+  currentStreakBest: number;
+  longestStreakBest: number;
+  activeHabits: number;
+  lastUpdated: string;
+}
+
+export interface Friend {
+  friendCode: string;
+  displayName: string;
+  stats: UserStats;
+  addedAt: string;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  friendCode: string;
+  displayName: string;
+  totalCompletions: number;
+  currentStreakBest: number;
+  longestStreakBest: number;
+  activeHabits: number;
+  isMe: boolean;
+}

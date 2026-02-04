@@ -35,6 +35,7 @@ interface HabitContextType {
   updateSettings: (updates: Partial<AppSettings>) => Promise<void>;
   importHabits: (habits: Habit[], settings?: AppSettings) => Promise<void>;
   refreshHabits: () => Promise<void>;
+  clearAllHabits: () => Promise<void>;
 }
 
 const defaultSettings: AppSettings = {
@@ -179,6 +180,16 @@ export const HabitProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, []);
 
+  const clearAllHabits = useCallback(async () => {
+    // Cancel all reminders first
+    for (const habit of habits) {
+      await cancelHabitReminder(habit.id);
+    }
+    // Clear state
+    setHabits([]);
+    setSettings(defaultSettings);
+  }, [habits]);
+
   return (
     <HabitContext.Provider
       value={{
@@ -196,6 +207,7 @@ export const HabitProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         updateSettings,
         importHabits,
         refreshHabits,
+        clearAllHabits,
       }}
     >
       {children}

@@ -13,6 +13,7 @@ import {
   HabitDetailScreen,
   EditHabitScreen,
   SettingsScreen,
+  LeaderboardScreen,
 } from './src/screens';
 import PremiumScreen from './src/screens/PremiumScreen';
 
@@ -83,6 +84,13 @@ const AppNavigator = () => {
             component={SettingsScreen}
             options={{
               title: 'Settings',
+            }}
+          />
+          <Stack.Screen
+            name="Leaderboard"
+            component={LeaderboardScreen}
+            options={{
+              title: 'Leaderboard',
             }}
           />
           <Stack.Screen

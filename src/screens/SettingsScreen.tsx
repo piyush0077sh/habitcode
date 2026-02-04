@@ -32,6 +32,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     restoreHabit,
     habits,
     importHabits,
+    clearAllHabits,
   } = useHabits();
 
   const handleContactDeveloper = () => {
@@ -47,8 +48,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     try {
       await exportData(habits, settings);
       Alert.alert('Success', 'Data exported successfully');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to export data');
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to export data');
     }
   };
 
@@ -88,6 +89,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           onPress: async () => {
             try {
               await clearAllData();
+              await clearAllHabits();
               Alert.alert('Success', 'All data has been cleared');
               navigation.reset({
                 index: 0,
