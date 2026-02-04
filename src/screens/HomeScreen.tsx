@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -13,9 +13,10 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useHabits } from '../context/HabitContext';
 import { usePremium } from '../context/PremiumContext';
-import { HabitCard } from '../components';
+import { HabitCard, CategoryFilter } from '../components';
 import AdBanner from '../components/AdBanner';
 import { formatDisplayDate } from '../utils/dateUtils';
+import { HabitCategory } from '../types';
 
 interface HomeScreenProps {
   navigation: any;
@@ -25,8 +26,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { colors } = useTheme();
   const { activeHabits, toggleCompletion, isLoading } = useHabits();
   const { isPremium, FREE_HABIT_LIMIT } = usePremium();
+  const [selectedCategory, setSelectedCategory] = useState<HabitCategory | 'all'>('all');
 
   const today = new Date();
+
+  // Filter habits by category
+  const filteredHabits = selectedCategory === 'all'
+    ? activeHabits
+    : activeHabits.filter(h => h.category === selectedCategory);
 
   const handleAddHabit = () => {
     if (!isPremium && activeHabits.length >= FREE_HABIT_LIMIT) {
@@ -79,6 +86,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           )}
           <TouchableOpacity
             style={[styles.menuButton, { backgroundColor: colors.surface }]}
+            onPress={() => navigation.navigate('Stats')}
+          >
+            <MaterialIcons name="bar-chart" size={24} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.menuButton, { backgroundColor: colors.surface }]}
+            onPress={() => navigation.navigate('Achievements')}
+          >
+            <MaterialIcons name="emoji-events" size={24} color="#f59e0b" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.menuButton, { backgroundColor: colors.surface }]}
             onPress={() => navigation.navigate('Leaderboard')}
           >
             <MaterialIcons name="leaderboard" size={24} color={colors.primary} />
@@ -105,6 +124,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </View>
       )}
 
+      {activeHabits.length > 0 && (
+        <CategoryFilter
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+      )}
+
       {activeHabits.length === 0 ? (
         <View style={styles.emptyContainer}>
           <MaterialIcons
@@ -128,7 +154,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </View>
       ) : (
         <FlatList
-          data={activeHabits}
+          data={filteredHabits}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <HabitCard
@@ -141,6 +167,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.noResultsContainer}>
+              <MaterialIcons name="search-off" size={48} color={colors.textSecondary} />
+              <Text style={[styles.noResultsText, { color: colors.textSecondary }]}>
+                No habits in this category
+              </Text>
+            </View>
+          }
         />
       )}
 
@@ -298,6 +332,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 12,
+  },
+  noResultsContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  noResultsText: {
+    fontSize: 16,
+    marginTop: 12,
   },
 });
 

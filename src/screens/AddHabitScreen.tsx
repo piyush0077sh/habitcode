@@ -19,8 +19,9 @@ import {
   Button,
   ColorPicker,
   IconPicker,
+  CategoryPicker,
 } from '../components';
-import { NewHabit, HabitFrequency } from '../types';
+import { NewHabit, HabitFrequency, HabitCategory } from '../types';
 import { HABIT_COLORS, HABIT_ICONS } from '../constants/theme';
 import { requestNotificationPermissions } from '../utils/notifications';
 
@@ -36,6 +37,7 @@ const AddHabitScreen: React.FC<AddHabitScreenProps> = ({ navigation }) => {
   const [description, setDescription] = useState('');
   const [selectedColor, setSelectedColor] = useState(HABIT_COLORS[10]);
   const [selectedIcon, setSelectedIcon] = useState(HABIT_ICONS[0]);
+  const [selectedCategory, setSelectedCategory] = useState<HabitCategory>('personal');
   const [frequency, setFrequency] = useState<HabitFrequency>('daily');
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState(new Date());
@@ -67,6 +69,7 @@ const AddHabitScreen: React.FC<AddHabitScreenProps> = ({ navigation }) => {
         description: description.trim(),
         color: selectedColor,
         icon: selectedIcon,
+        category: selectedCategory,
         frequency,
         reminderEnabled,
         reminderTime: reminderEnabled
@@ -127,6 +130,11 @@ const AddHabitScreen: React.FC<AddHabitScreenProps> = ({ navigation }) => {
           selectedIcon={selectedIcon}
           selectedColor={selectedColor}
           onSelectIcon={setSelectedIcon}
+        />
+
+        <CategoryPicker
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
         />
 
         <View style={styles.section}>

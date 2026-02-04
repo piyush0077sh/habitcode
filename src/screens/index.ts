@@ -4,3 +4,6 @@ export { default as HabitDetailScreen } from './HabitDetailScreen';
 export { default as EditHabitScreen } from './EditHabitScreen';
 export { default as SettingsScreen } from './SettingsScreen';
 export { default as LeaderboardScreen } from './LeaderboardScreen';
+export { default as OnboardingScreen } from './OnboardingScreen';
+export { default as StatsScreen } from './StatsScreen';
+export { default as AchievementsScreen } from './AchievementsScreen';

@@ -19,8 +19,9 @@ import {
   Button,
   ColorPicker,
   IconPicker,
+  CategoryPicker,
 } from '../components';
-import { HabitFrequency } from '../types';
+import { HabitFrequency, HabitCategory } from '../types';
 import { requestNotificationPermissions } from '../utils/notifications';
 
 const EditHabitScreen = ({
@@ -38,6 +39,9 @@ const EditHabitScreen = ({
   const [selectedColor, setSelectedColor] = useState(habit?.color || '#6366f1');
   const [selectedIcon, setSelectedIcon] = useState(
     habit?.icon || 'fitness-center'
+  );
+  const [selectedCategory, setSelectedCategory] = useState<HabitCategory>(
+    habit?.category || 'other'
   );
   const [frequency, setFrequency] = useState<HabitFrequency>(
     habit?.frequency || 'daily'
@@ -92,6 +96,7 @@ const EditHabitScreen = ({
         description: description.trim(),
         color: selectedColor,
         icon: selectedIcon,
+        category: selectedCategory,
         frequency,
         reminderEnabled,
         reminderTime: reminderEnabled
@@ -150,6 +155,11 @@ const EditHabitScreen = ({
           selectedIcon={selectedIcon}
           selectedColor={selectedColor}
           onSelectIcon={setSelectedIcon}
+        />
+
+        <CategoryPicker
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
         />
 
         <View style={styles.section}>

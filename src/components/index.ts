@@ -7,3 +7,8 @@ export { default as TextInput } from './TextInput';
 export { default as Button } from './Button';
 export { default as AdBanner } from './AdBanner';
 export { default as Logo } from './Logo';
+export { CategoryFilter } from './CategoryFilter';
+export { CategoryPicker } from './CategoryPicker';
+export { ConfettiAnimation } from './ConfettiAnimation';
+export { CheckAnimation } from './CheckAnimation';
+export { ShareCard } from './ShareCard';

@@ -2,13 +2,18 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeMode, ThemeColors } from '../types';
-import { LIGHT_COLORS, DARK_COLORS, STORAGE_KEYS } from '../constants/theme';
+import { LIGHT_COLORS, DARK_COLORS, STORAGE_KEYS, ACCENT_COLORS, GRADIENT_BACKGROUNDS } from '../constants/theme';
 
 interface ThemeContextType {
   themeMode: ThemeMode;
   colors: ThemeColors;
   isDark: boolean;
   setThemeMode: (mode: ThemeMode) => void;
+  accentColorIndex: number;
+  setAccentColor: (index: number) => void;
+  gradientIndex: number;
+  setGradient: (index: number) => void;
+  gradientColors: string[];
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -16,19 +21,31 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const systemColorScheme = useColorScheme();
   const [themeMode, setThemeModeState] = useState<ThemeMode>('dark');
+  const [accentColorIndex, setAccentColorIndex] = useState(0);
+  const [gradientIndex, setGradientIndex] = useState(0);
 
   useEffect(() => {
-    loadThemeMode();
+    loadThemeSettings();
   }, []);
 
-  const loadThemeMode = async () => {
+  const loadThemeSettings = async () => {
     try {
-      const saved = await AsyncStorage.getItem(STORAGE_KEYS.THEME);
-      if (saved) {
-        setThemeModeState(saved as ThemeMode);
+      const [savedTheme, savedAccent, savedGradient] = await Promise.all([
+        AsyncStorage.getItem(STORAGE_KEYS.THEME),
+        AsyncStorage.getItem(STORAGE_KEYS.ACCENT_COLOR),
+        AsyncStorage.getItem(STORAGE_KEYS.GRADIENT_BG),
+      ]);
+      if (savedTheme) {
+        setThemeModeState(savedTheme as ThemeMode);
+      }
+      if (savedAccent) {
+        setAccentColorIndex(parseInt(savedAccent, 10));
+      }
+      if (savedGradient) {
+        setGradientIndex(parseInt(savedGradient, 10));
       }
     } catch (error) {
-      console.error('Error loading theme mode:', error);
+      console.error('Error loading theme settings:', error);
     }
   };
 
@@ -41,14 +58,51 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
+  const setAccentColor = async (index: number) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.ACCENT_COLOR, index.toString());
+      setAccentColorIndex(index);
+    } catch (error) {
+      console.error('Error saving accent color:', error);
+    }
+  };
+
+  const setGradient = async (index: number) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.GRADIENT_BG, index.toString());
+      setGradientIndex(index);
+    } catch (error) {
+      console.error('Error saving gradient:', error);
+    }
+  };
+
   const isDark =
     themeMode === 'dark' ||
     (themeMode === 'system' && systemColorScheme === 'dark');
 
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  // Apply accent color to base colors
+  const accent = ACCENT_COLORS[accentColorIndex] || ACCENT_COLORS[0];
+  const baseColors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  const colors: ThemeColors = {
+    ...baseColors,
+    primary: isDark ? accent.dark : accent.light,
+    primaryLight: isDark ? accent.dark + 'aa' : accent.light + 'aa',
+  };
+
+  const gradientColors = GRADIENT_BACKGROUNDS[gradientIndex]?.colors || GRADIENT_BACKGROUNDS[0].colors;
 
   return (
-    <ThemeContext.Provider value={{ themeMode, colors, isDark, setThemeMode }}>
+    <ThemeContext.Provider value={{ 
+      themeMode, 
+      colors, 
+      isDark, 
+      setThemeMode,
+      accentColorIndex,
+      setAccentColor,
+      gradientIndex,
+      setGradient,
+      gradientColors,
+    }}>
       {children}
     </ThemeContext.Provider>
   );

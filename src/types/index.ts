@@ -1,9 +1,22 @@
+// Habit Categories
+export type HabitCategory = 
+  | 'health'
+  | 'fitness'
+  | 'work'
+  | 'learning'
+  | 'personal'
+  | 'finance'
+  | 'social'
+  | 'mindfulness'
+  | 'other';
+
 export interface Habit {
   id: string;
   name: string;
   description: string;
   icon: string;
   color: string;
+  category: HabitCategory;
   frequency: HabitFrequency;
   reminderTime: string | null;
   reminderEnabled: boolean;
@@ -13,6 +26,49 @@ export interface Habit {
 }
 
 export type HabitFrequency = 'daily' | 'weekly' | 'custom';
+
+// Achievement System
+export type AchievementId = 
+  | 'first_habit'
+  | 'first_completion'
+  | 'streak_3'
+  | 'streak_7'
+  | 'streak_14'
+  | 'streak_30'
+  | 'streak_60'
+  | 'streak_100'
+  | 'streak_365'
+  | 'completions_10'
+  | 'completions_50'
+  | 'completions_100'
+  | 'completions_500'
+  | 'completions_1000'
+  | 'habits_3'
+  | 'habits_5'
+  | 'habits_10'
+  | 'perfect_week'
+  | 'perfect_month'
+  | 'early_bird'
+  | 'night_owl'
+  | 'weekend_warrior'
+  | 'consistency_king';
+
+export interface Achievement {
+  id: AchievementId;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  unlockedAt: string | null;
+  progress: number; // 0-100
+  requirement: number;
+  currentValue: number;
+}
+
+export interface AchievementNotification {
+  achievement: Achievement;
+  shown: boolean;
+}
 
 export interface HabitFrequencyConfig {
   type: HabitFrequency;
@@ -25,6 +81,7 @@ export interface NewHabit {
   description: string;
   icon: string;
   color: string;
+  category: HabitCategory;
   frequency: HabitFrequency;
   reminderTime: string | null;
   reminderEnabled: boolean;

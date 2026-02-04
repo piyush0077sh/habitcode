@@ -6,12 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useHabits } from '../context/HabitContext';
-import { CalendarView } from '../components';
+import { CalendarView, ShareCard } from '../components';
 import { calculateStreak, getLastNDays } from '../utils/dateUtils';
 
 const HabitDetailScreen = ({
@@ -25,6 +26,7 @@ const HabitDetailScreen = ({
 
   const habit = habits.find((h) => h.id === habitId);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const streakInfo = useMemo(() => {
     if (!habit) return null;
@@ -177,6 +179,16 @@ const HabitDetailScreen = ({
 
         <View style={styles.actionsContainer}>
           <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: habit.color + '15' }]}
+            onPress={() => setShowShareModal(true)}
+          >
+            <MaterialIcons name="share" size={20} color={habit.color} />
+            <Text style={[styles.actionText, { color: habit.color }]}>
+              Share Progress
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: colors.surface }]}
             onPress={() =>
               navigation.navigate('EditHabit', { habitId: habit.id })
@@ -212,6 +224,20 @@ const HabitDetailScreen = ({
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Share Modal */}
+      <Modal
+        visible={showShareModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowShareModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+            <ShareCard habit={habit} onClose={() => setShowShareModal(false)} />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -289,6 +315,19 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 16,
     fontWeight: '500',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    width: '100%',
+    maxWidth: 400,
   },
 });
 

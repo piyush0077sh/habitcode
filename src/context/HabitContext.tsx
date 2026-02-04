@@ -62,7 +62,12 @@ export const HabitProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         loadHabits(),
         loadSettings(),
       ]);
-      setHabits(loadedHabits);
+      // Ensure all habits have a category (for backward compatibility)
+      const habitsWithCategory = loadedHabits.map(habit => ({
+        ...habit,
+        category: habit.category || 'other',
+      }));
+      setHabits(habitsWithCategory);
       if (loadedSettings) {
         setSettings(loadedSettings);
       }

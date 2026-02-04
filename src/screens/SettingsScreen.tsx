@@ -18,13 +18,23 @@ import { usePremium } from '../context/PremiumContext';
 import { Logo } from '../components';
 import { ThemeMode } from '../types';
 import { exportData, importData, clearAllData } from '../utils/storage';
+import { ACCENT_COLORS, GRADIENT_BACKGROUNDS } from '../constants/theme';
 
 interface SettingsScreenProps {
   navigation: any;
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
-  const { colors, themeMode, setThemeMode, isDark } = useTheme();
+  const { 
+    colors, 
+    themeMode, 
+    setThemeMode, 
+    isDark,
+    accentColorIndex,
+    setAccentColor,
+    gradientIndex,
+    setGradient,
+  } = useTheme();
   const { isPremium } = usePremium();
   const {
     settings,
@@ -300,6 +310,72 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           <ThemeOption mode="system" label="System" icon="settings-suggest" />
         </View>
 
+        {/* Accent Color Picker */}
+        <Text style={[styles.subsectionHeader, { color: colors.text }]}>
+          Accent Color
+        </Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.colorPickerScroll}
+          contentContainerStyle={styles.colorPickerContent}
+        >
+          {ACCENT_COLORS.map((accent, index) => (
+            <TouchableOpacity
+              key={accent.name}
+              style={[
+                styles.accentColorOption,
+                {
+                  backgroundColor: isDark ? accent.dark : accent.light,
+                  borderWidth: accentColorIndex === index ? 3 : 0,
+                  borderColor: '#fff',
+                },
+              ]}
+              onPress={() => setAccentColor(index)}
+            >
+              {accentColorIndex === index && (
+                <MaterialIcons name="check" size={20} color="#fff" />
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Gradient Background (Dark mode only) */}
+        {isDark && (
+          <>
+            <Text style={[styles.subsectionHeader, { color: colors.text }]}>
+              Background Style
+            </Text>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              style={styles.colorPickerScroll}
+              contentContainerStyle={styles.colorPickerContent}
+            >
+              {GRADIENT_BACKGROUNDS.map((gradient, index) => (
+                <TouchableOpacity
+                  key={gradient.name}
+                  style={[
+                    styles.gradientOption,
+                    {
+                      backgroundColor: gradient.colors[0] === 'transparent' 
+                        ? colors.surface 
+                        : gradient.colors[0],
+                      borderWidth: gradientIndex === index ? 2 : 1,
+                      borderColor: gradientIndex === index ? colors.primary : colors.border,
+                    },
+                  ]}
+                  onPress={() => setGradient(index)}
+                >
+                  <Text style={[styles.gradientLabel, { color: colors.text }]}>
+                    {gradient.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </>
+        )}
+
         <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
           PREFERENCES
         </Text>
@@ -572,6 +648,37 @@ const styles = StyleSheet.create({
   versionText: {
     marginTop: 12,
     fontSize: 13,
+    fontWeight: '500',
+  },
+  subsectionHeader: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 12,
+    marginLeft: 4,
+  },
+  colorPickerScroll: {
+    marginBottom: 8,
+  },
+  colorPickerContent: {
+    gap: 10,
+  },
+  accentColorOption: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gradientOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  gradientLabel: {
+    fontSize: 12,
     fontWeight: '500',
   },
 });

@@ -1,12 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { HabitProvider } from './src/context/HabitContext';
 import { PremiumProvider } from './src/context/PremiumContext';
+import { AchievementProvider } from './src/context/AchievementContext';
 import { checkForUpdates } from './src/utils/updateChecker';
+import { STORAGE_KEYS } from './src/constants/theme';
 import {
   HomeScreen,
   AddHabitScreen,
@@ -14,13 +17,30 @@ import {
   EditHabitScreen,
   SettingsScreen,
   LeaderboardScreen,
+  OnboardingScreen,
+  StatsScreen,
+  AchievementsScreen,
 } from './src/screens';
 import PremiumScreen from './src/screens/PremiumScreen';
 
 const Stack = createNativeStackNavigator();
 
-const AppNavigator = () => {
+interface AppNavigatorProps {
+  showOnboarding: boolean;
+  onOnboardingComplete: () => void;
+}
+
+const AppNavigator: React.FC<AppNavigatorProps> = ({ showOnboarding, onOnboardingComplete }) => {
   const { colors, isDark } = useTheme();
+
+  if (showOnboarding) {
+    return (
+      <>
+        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <OnboardingScreen navigation={{}} onComplete={onOnboardingComplete} />
+      </>
+    );
+  }
 
   return (
     <>
@@ -94,6 +114,20 @@ const AppNavigator = () => {
             }}
           />
           <Stack.Screen
+            name="Stats"
+            component={StatsScreen}
+            options={{
+              title: 'Statistics',
+            }}
+          />
+          <Stack.Screen
+            name="Achievements"
+            component={AchievementsScreen}
+            options={{
+              title: 'Achievements',
+            }}
+          />
+          <Stack.Screen
             name="Premium"
             component={PremiumScreen}
             options={{
@@ -108,16 +142,42 @@ const AppNavigator = () => {
 };
 
 export default function App() {
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
+
   useEffect(() => {
     checkForUpdates();
+    checkOnboardingStatus();
   }, []);
+
+  const checkOnboardingStatus = async () => {
+    try {
+      const hasSeenOnboarding = await AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
+      setShowOnboarding(hasSeenOnboarding !== 'true');
+    } catch {
+      setShowOnboarding(false);
+    }
+  };
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+  };
+
+  // Still loading onboarding status
+  if (showOnboarding === null) {
+    return null;
+  }
 
   return (
     <SafeAreaProvider>
       <ThemeProvider>
         <PremiumProvider>
           <HabitProvider>
-            <AppNavigator />
+            <AchievementProvider>
+              <AppNavigator 
+                showOnboarding={showOnboarding} 
+                onOnboardingComplete={handleOnboardingComplete} 
+              />
+            </AchievementProvider>
           </HabitProvider>
         </PremiumProvider>
       </ThemeProvider>

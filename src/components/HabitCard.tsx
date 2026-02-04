@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ViewStyle,
+  Animated,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -24,6 +25,58 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
   const today = new Date();
   const isCompletedToday = isDateCompleted(habit, today);
   const streakInfo = calculateStreak(habit);
+  
+  // Animation values
+  const checkScale = useRef(new Animated.Value(1)).current;
+  const checkRotate = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [showPulse, setShowPulse] = useState(false);
+
+  const handleToggle = () => {
+    if (!isCompletedToday) {
+      // Animate on completion
+      setShowPulse(true);
+      
+      // Scale and rotate animation
+      Animated.sequence([
+        Animated.parallel([
+          Animated.spring(checkScale, {
+            toValue: 1.3,
+            friction: 3,
+            tension: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(checkRotate, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.spring(checkScale, {
+          toValue: 1,
+          friction: 5,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // Pulse animation
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.5,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => setShowPulse(false));
+    }
+    
+    checkRotate.setValue(0);
+    onToggleToday();
+  };
 
   return (
     <TouchableOpacity
@@ -90,14 +143,44 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
                 elevation: isCompletedToday ? 4 : 0,
               },
             ]}
-            onPress={onToggleToday}
+            onPress={handleToggle}
             activeOpacity={0.7}
           >
-            {isCompletedToday ? (
-              <MaterialIcons name="check" size={22} color="#fff" />
-            ) : (
-              <MaterialIcons name="radio-button-unchecked" size={22} color={colors.textSecondary} />
+            {/* Pulse effect */}
+            {showPulse && (
+              <Animated.View
+                style={[
+                  styles.pulseCircle,
+                  {
+                    backgroundColor: habit.color + '40',
+                    transform: [{ scale: pulseAnim }],
+                    opacity: pulseAnim.interpolate({
+                      inputRange: [1, 1.5],
+                      outputRange: [0.6, 0],
+                    }),
+                  },
+                ]}
+              />
             )}
+            <Animated.View
+              style={{
+                transform: [
+                  { scale: checkScale },
+                  {
+                    rotate: checkRotate.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg'],
+                    }),
+                  },
+                ],
+              }}
+            >
+              {isCompletedToday ? (
+                <MaterialIcons name="check" size={22} color="#fff" />
+              ) : (
+                <MaterialIcons name="radio-button-unchecked" size={22} color={colors.textSecondary} />
+              )}
+            </Animated.View>
           </TouchableOpacity>
         </View>
 
@@ -191,6 +274,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     shadowOffset: { width: 0, height: 2 },
+    overflow: 'hidden',
+  },
+  pulseCircle: {
+    position: 'absolute',
+    width: 38,
+    height: 38,
+    borderRadius: 12,
   },
   gridContainer: {
     marginVertical: 12,
