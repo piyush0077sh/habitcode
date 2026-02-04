@@ -1,7 +1,7 @@
 import { Alert, Linking } from 'react-native';
 
 // Update this version with each release
-const CURRENT_VERSION = '1.0.0';
+const CURRENT_VERSION = '1.1.0';
 
 // Your GitHub Gist URL for version checking
 const VERSION_URL = 'https://gist.githubusercontent.com/piyush0077sh/22d988bd21780b099fde60235bd0916f/raw/version.json';
