@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Purple gradient -->
+    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Pink overlay gradient -->
+    <linearGradient id="pinkOverlay" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ec4899;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#db2777;stop-opacity:0.3" />
+    </linearGradient>
+    
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="12"/>
+      <feOffset dx="0" dy="4" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.4"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Container with rounded corners (28% border radius = 143.36px for 512px) -->
+  <g filter="url(#shadow)">
+    <!-- Background with purple gradient -->
+    <rect x="0" y="0" width="512" height="512" rx="143.36" ry="143.36" fill="url(#purpleGradient)"/>
+    
+    <!-- Pink overlay with rotation effect -->
+    <g transform="translate(256, 256) rotate(45) translate(-256, -256)">
+      <rect x="128" y="128" width="256" height="256" fill="url(#pinkOverlay)"/>
+    </g>
+    
+    <!-- Track changes icon (circular target with curved arrows) -->
+    <g transform="translate(256, 256)">
+      <!-- Outer circle -->
+      <circle cx="0" cy="0" r="96" fill="none" stroke="white" stroke-width="16" opacity="0.9"/>
+      
+      <!-- Middle circle -->
+      <circle cx="0" cy="0" r="64" fill="none" stroke="white" stroke-width="12" opacity="0.9"/>
+      
+      <!-- Inner circle -->
+      <circle cx="0" cy="0" r="32" fill="none" stroke="white" stroke-width="10" opacity="0.9"/>
+      
+      <!-- Center dot -->
+      <circle cx="0" cy="0" r="12" fill="white" opacity="0.9"/>
+      
+      <!-- Curved arrow 1 (top right) -->
+      <path d="M 48 -48 Q 68 -68 88 -48 L 82 -54 M 88 -48 L 82 -42" 
+            stroke="white" stroke-width="10" fill="none" 
+            stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+      
+      <!-- Curved arrow 2 (bottom left) -->
+      <path d="M -48 48 Q -68 68 -88 48 L -82 54 M -88 48 L -82 42" 
+            stroke="white" stroke-width="10" fill="none" 
+            stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+      
+      <!-- Rotation arrows around the circles -->
+      <path d="M 80 0 Q 96 -16 96 -32 L 102 -26 M 96 -32 L 90 -26" 
+            stroke="white" stroke-width="8" fill="none" 
+            stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+      
+      <path d="M -80 0 Q -96 16 -96 32 L -102 26 M -96 32 L -90 26" 
+            stroke="white" stroke-width="8" fill="none" 
+            stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+    </g>
+  </g>
+</svg>
