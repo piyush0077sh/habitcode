@@ -4,19 +4,20 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useAchievements } from '../context/AchievementContext';
 import { Achievement } from '../types';
-
-const { width } = Dimensions.get('window');
+import { FONT, RADIUS, SPACING, hexToRgba } from '../constants/theme';
 
 const AchievementsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { colors } = useTheme();
   const { achievements, unlockedCount, totalCount } = useAchievements();
+  const { width } = useWindowDimensions();
+  const cardWidth = (width - 44) / 2;
 
   const unlockedAchievements = achievements.filter((a) => a.unlockedAt);
   const lockedAchievements = achievements.filter((a) => !a.unlockedAt);
@@ -29,6 +30,7 @@ const AchievementsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         style={[
           styles.achievementCard,
           {
+            width: cardWidth,
             backgroundColor: isUnlocked ? colors.surface : colors.surfaceVariant,
             borderColor: isUnlocked ? achievement.color : colors.border,
             opacity: isUnlocked ? 1 : 0.7,
@@ -39,7 +41,9 @@ const AchievementsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           style={[
             styles.iconContainer,
             {
-              backgroundColor: isUnlocked ? achievement.color + '20' : colors.border + '50',
+              backgroundColor: isUnlocked 
+                ? hexToRgba(achievement.color, 0.12) 
+                : hexToRgba(colors.border, 0.3),
             },
           ]}
         >
@@ -178,77 +182,77 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    padding: SPACING.lg,
   },
   progressHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 24,
-    gap: 16,
+    padding: SPACING.xl,
+    borderRadius: RADIUS.lg,
+    marginBottom: SPACING.xxl,
+    gap: SPACING.lg,
   },
   progressCircleContainer: {},
   progressCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 4,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    borderWidth: 3,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
   },
   progressValue: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 26,
+    fontFamily: FONT.bold,
   },
   progressTotal: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 15,
+    fontFamily: FONT.medium,
   },
   progressInfo: {
     flex: 1,
   },
   progressTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: 17,
+    fontFamily: FONT.bold,
+    marginBottom: SPACING.xs,
   },
   progressSubtitle: {
     fontSize: 14,
+    fontFamily: FONT.regular,
     lineHeight: 20,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 16,
+    fontSize: 17,
+    fontFamily: FONT.bold,
+    marginBottom: SPACING.lg,
   },
   achievementsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
+    gap: SPACING.md,
+    marginBottom: SPACING.xxl,
   },
   achievementCard: {
-    width: (width - 44) / 2,
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 2,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1.5,
     alignItems: 'center',
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
     position: 'relative',
   },
   checkBadge: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
+    bottom: -2,
+    right: -2,
     width: 20,
     height: 20,
     borderRadius: 10,
@@ -257,37 +261,40 @@ const styles = StyleSheet.create({
   },
   achievementName: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONT.semibold,
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: SPACING.xs,
   },
   achievementDescription: {
     fontSize: 12,
+    fontFamily: FONT.regular,
     textAlign: 'center',
     lineHeight: 16,
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
   },
   progressContainer: {
     width: '100%',
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   progressBar: {
-    height: 6,
-    borderRadius: 3,
+    height: 4,
+    borderRadius: 2,
     overflow: 'hidden',
-    marginBottom: 4,
+    marginBottom: SPACING.xs,
   },
   progressFill: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 2,
   },
   progressText: {
     fontSize: 11,
+    fontFamily: FONT.medium,
     textAlign: 'center',
   },
   unlockedDate: {
     fontSize: 11,
-    marginTop: 4,
+    fontFamily: FONT.regular,
+    marginTop: SPACING.xs,
   },
 });
 

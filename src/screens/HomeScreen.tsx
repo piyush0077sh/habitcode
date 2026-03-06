@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  useWindowDimensions,
+  Animated,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useHabits } from '../context/HabitContext';
@@ -17,16 +19,63 @@ import { HabitCard, CategoryFilter } from '../components';
 import AdBanner from '../components/AdBanner';
 import { formatDisplayDate } from '../utils/dateUtils';
 import { HabitCategory } from '../types';
+import { FONT, RADIUS, SPACING, SHADOW } from '../constants/theme';
 
 interface HomeScreenProps {
   navigation: any;
 }
+
+const AD_BANNER_HEIGHT = 50;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { colors } = useTheme();
   const { activeHabits, toggleCompletion, isLoading } = useHabits();
   const { isPremium, FREE_HABIT_LIMIT } = usePremium();
   const [selectedCategory, setSelectedCategory] = useState<HabitCategory | 'all'>('all');
+  const insets = useSafeAreaInsets();
+  const fabScaleAnim = useRef(new Animated.Value(1)).current;
+  const fabRotateAnim = useRef(new Animated.Value(0)).current;
+
+  const handleFabPressIn = useCallback(() => {
+    Animated.parallel([
+      Animated.spring(fabScaleAnim, {
+        toValue: 0.88,
+        useNativeDriver: true,
+        speed: 50,
+        bounciness: 4,
+      }),
+      Animated.timing(fabRotateAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fabScaleAnim, fabRotateAnim]);
+
+  const handleFabPressOut = useCallback(() => {
+    Animated.parallel([
+      Animated.spring(fabScaleAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 30,
+        bounciness: 10,
+      }),
+      Animated.timing(fabRotateAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fabScaleAnim, fabRotateAnim]);
+
+  const fabRotation = fabRotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '90deg'],
+  });
+
+  const adHeight = isPremium ? 0 : AD_BANNER_HEIGHT;
+  const fabBottom = adHeight + 16;
+  const listBottomPadding = adHeight + 80 + 16;
 
   const today = new Date();
 
@@ -75,40 +124,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             {formatDisplayDate(today)}
           </Text>
         </View>
-        <View style={styles.headerButtons}>
-          {!isPremium && (
-            <TouchableOpacity
-              style={[styles.premiumButton]}
-              onPress={() => navigation.navigate('Premium')}
-            >
-              <MaterialIcons name="workspace-premium" size={20} color="#FFD700" />
-            </TouchableOpacity>
-          )}
+        {!isPremium && (
           <TouchableOpacity
-            style={[styles.menuButton, { backgroundColor: colors.surface }]}
-            onPress={() => navigation.navigate('Stats')}
+            style={[styles.premiumButton]}
+            onPress={() => navigation.navigate('Premium')}
           >
-            <MaterialIcons name="bar-chart" size={24} color={colors.primary} />
+            <MaterialIcons name="workspace-premium" size={20} color={colors.warning} />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.menuButton, { backgroundColor: colors.surface }]}
-            onPress={() => navigation.navigate('Achievements')}
-          >
-            <MaterialIcons name="emoji-events" size={24} color="#f59e0b" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.menuButton, { backgroundColor: colors.surface }]}
-            onPress={() => navigation.navigate('Leaderboard')}
-          >
-            <MaterialIcons name="leaderboard" size={24} color={colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.menuButton, { backgroundColor: colors.surface }]}
-            onPress={() => navigation.navigate('Settings')}
-          >
-            <MaterialIcons name="settings" size={24} color={colors.text} />
-          </TouchableOpacity>
-        </View>
+        )}
       </View>
 
       {!isPremium && activeHabits.length > 0 && (
@@ -145,7 +168,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             Create your first habit and begin tracking your progress
           </Text>
           <TouchableOpacity
-            style={[styles.addButton, { backgroundColor: colors.primary }]}
+            style={[styles.addButton, { backgroundColor: colors.primary }, SHADOW.md]}
             onPress={() => navigation.navigate('AddHabit')}
           >
             <MaterialIcons name="add" size={24} color="#fff" />
@@ -165,7 +188,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               onToggleToday={() => toggleCompletion(item.id, today)}
             />
           )}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[styles.listContent, { paddingBottom: listBottomPadding }]}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.noResultsContainer}>
@@ -179,19 +202,30 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       )}
 
       {activeHabits.length > 0 && (
-        <TouchableOpacity
+        <Animated.View
           style={[
             styles.fab, 
+            SHADOW.lg,
             { 
               backgroundColor: colors.primary,
-              shadowColor: colors.primary,
+              bottom: fabBottom,
+              transform: [
+                { scale: fabScaleAnim },
+                { rotate: fabRotation },
+              ],
             }
           ]}
-          onPress={handleAddHabit}
-          activeOpacity={0.85}
         >
-          <MaterialIcons name="add" size={30} color="#fff" />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleAddHabit}
+            onPressIn={handleFabPressIn}
+            onPressOut={handleFabPressOut}
+            activeOpacity={0.9}
+            style={styles.fabInner}
+          >
+            <MaterialIcons name="add" size={28} color="#fff" />
+          </TouchableOpacity>
+        </Animated.View>
       )}
 
       {/* Ad Banner at bottom */}
@@ -213,71 +247,52 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-    paddingTop: 10,
-  },
-  headerButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.lg,
+    paddingTop: SPACING.sm,
   },
   premiumButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
   },
   greeting: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 13,
+    fontFamily: FONT.semibold,
     letterSpacing: 0.5,
     textTransform: 'uppercase',
-    opacity: 0.7,
   },
   date: {
-    fontSize: 28,
-    fontWeight: '800',
-    marginTop: 4,
+    fontSize: 26,
+    fontFamily: FONT.bold,
+    marginTop: SPACING.xs,
     letterSpacing: -0.5,
-  },
-  menuButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   limitBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginHorizontal: 20,
-    marginBottom: 8,
-    borderRadius: 10,
-    gap: 8,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.xl,
+    marginBottom: SPACING.sm,
+    borderRadius: RADIUS.sm,
+    gap: SPACING.sm,
   },
   limitText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: FONT.semibold,
   },
   upgradeLink: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONT.bold,
   },
   listContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 170,
-    paddingTop: 8,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.sm,
   },
   emptyContainer: {
     flex: 1,
@@ -286,52 +301,47 @@ const styles = StyleSheet.create({
     paddingHorizontal: 48,
   },
   emptyTitle: {
-    fontSize: 26,
-    fontWeight: '800',
-    marginTop: 28,
+    fontSize: 24,
+    fontFamily: FONT.bold,
+    marginTop: SPACING.xxl,
     textAlign: 'center',
     letterSpacing: -0.5,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 15,
+    fontFamily: FONT.regular,
     textAlign: 'center',
-    marginTop: 12,
-    lineHeight: 24,
-    opacity: 0.8,
+    marginTop: SPACING.md,
+    lineHeight: 22,
   },
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 28,
-    paddingVertical: 16,
-    borderRadius: 16,
-    marginTop: 36,
-    shadowColor: '#7c3aed',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    paddingHorizontal: SPACING.xxl,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.xxxl,
   },
   addButtonText: {
     color: '#fff',
-    fontSize: 17,
-    fontWeight: '700',
-    marginLeft: 10,
-    letterSpacing: 0.3,
+    fontSize: 16,
+    fontFamily: FONT.semibold,
+    marginLeft: SPACING.sm,
   },
   fab: {
     position: 'absolute',
-    right: 24,
-    bottom: 82,
-    width: 64,
-    height: 64,
-    borderRadius: 20,
+    right: SPACING.xl,
+    width: 56,
+    height: 56,
+    borderRadius: RADIUS.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 8,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
+  },
+  fabInner: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   noResultsContainer: {
     flex: 1,
@@ -340,8 +350,9 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   noResultsText: {
-    fontSize: 16,
-    marginTop: 12,
+    fontSize: 15,
+    fontFamily: FONT.medium,
+    marginTop: SPACING.md,
   },
 });
 

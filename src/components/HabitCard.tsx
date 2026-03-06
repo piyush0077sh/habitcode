@@ -1,16 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ViewStyle,
   Animated,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { Habit } from '../types';
 import { getLast7Days, isDateCompleted, calculateStreak } from '../utils/dateUtils';
+import { FONT, RADIUS, SPACING, SHADOW, hexToRgba } from '../constants/theme';
 import TileGrid from './TileGrid';
 
 interface HabitCardProps {
@@ -25,19 +25,36 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
   const today = new Date();
   const isCompletedToday = isDateCompleted(habit, today);
   const streakInfo = calculateStreak(habit);
-  
+
   // Animation values
+  const cardScaleAnim = useRef(new Animated.Value(1)).current;
   const checkScale = useRef(new Animated.Value(1)).current;
   const checkRotate = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const [showPulse, setShowPulse] = useState(false);
 
+  const handleCardPressIn = useCallback(() => {
+    Animated.spring(cardScaleAnim, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  }, [cardScaleAnim]);
+
+  const handleCardPressOut = useCallback(() => {
+    Animated.spring(cardScaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 40,
+      bounciness: 6,
+    }).start();
+  }, [cardScaleAnim]);
+
   const handleToggle = () => {
     if (!isCompletedToday) {
-      // Animate on completion
       setShowPulse(true);
-      
-      // Scale and rotate animation
+
       Animated.sequence([
         Animated.parallel([
           Animated.spring(checkScale, {
@@ -59,7 +76,6 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
         }),
       ]).start();
 
-      // Pulse animation
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: 1.5,
@@ -73,50 +89,49 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
         }),
       ]).start(() => setShowPulse(false));
     }
-    
+
     checkRotate.setValue(0);
     onToggleToday();
   };
 
   return (
+    <Animated.View style={{ transform: [{ scale: cardScaleAnim }] }}>
     <TouchableOpacity
       style={[
         styles.card,
         {
           backgroundColor: colors.surface,
-          borderColor: colors.border,
-          shadowColor: habit.color,
         },
+        SHADOW.md,
       ]}
       onPress={onPress}
+      onPressIn={handleCardPressIn}
+      onPressOut={handleCardPressOut}
       activeOpacity={0.8}
     >
-      {/* Gradient accent bar */}
-      <View 
+      {/* Subtle left-edge color indicator */}
+      <View
         style={[
-          styles.accentBar, 
-          { backgroundColor: habit.color }
-        ]} 
+          styles.colorIndicator,
+          { backgroundColor: habit.color },
+        ]}
       />
-      
+
       <View style={styles.cardContent}>
         <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <View 
-              style={[
-                styles.iconCircle, 
-                { 
-                  backgroundColor: habit.color + '15',
-                  borderColor: habit.color + '30',
-                }
-              ]}
-            >
-              <MaterialIcons
-                name={habit.icon as any}
-                size={26}
-                color={habit.color}
-              />
-            </View>
+          <View
+            style={[
+              styles.iconCircle,
+              {
+                backgroundColor: hexToRgba(habit.color, 0.10),
+              },
+            ]}
+          >
+            <MaterialIcons
+              name={habit.icon as any}
+              size={24}
+              color={habit.color}
+            />
           </View>
           <View style={styles.titleContainer}>
             <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
@@ -137,22 +152,17 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
               {
                 backgroundColor: isCompletedToday ? habit.color : 'transparent',
                 borderColor: isCompletedToday ? habit.color : colors.border,
-                shadowColor: isCompletedToday ? habit.color : 'transparent',
-                shadowOpacity: isCompletedToday ? 0.4 : 0,
-                shadowRadius: isCompletedToday ? 8 : 0,
-                elevation: isCompletedToday ? 4 : 0,
               },
             ]}
             onPress={handleToggle}
             activeOpacity={0.7}
           >
-            {/* Pulse effect */}
             {showPulse && (
               <Animated.View
                 style={[
                   styles.pulseCircle,
                   {
-                    backgroundColor: habit.color + '40',
+                    backgroundColor: hexToRgba(habit.color, 0.25),
                     transform: [{ scale: pulseAnim }],
                     opacity: pulseAnim.interpolate({
                       inputRange: [1, 1.5],
@@ -176,9 +186,9 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
               }}
             >
               {isCompletedToday ? (
-                <MaterialIcons name="check" size={22} color="#fff" />
+                <MaterialIcons name="check" size={20} color="#fff" />
               ) : (
-                <MaterialIcons name="radio-button-unchecked" size={22} color={colors.textSecondary} />
+                <MaterialIcons name="circle" size={6} color={colors.disabled} />
               )}
             </Animated.View>
           </TouchableOpacity>
@@ -193,11 +203,9 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
           />
         </View>
 
-        <View style={[styles.footer, { borderTopColor: colors.border }]}>
+        <View style={styles.footer}>
           <View style={styles.streakContainer}>
-            <View style={styles.streakIconWrapper}>
-              <MaterialIcons name="local-fire-department" size={18} color="#f59e0b" />
-            </View>
+            <MaterialIcons name="local-fire-department" size={16} color={colors.warning} />
             <Text style={[styles.streakText, { color: colors.text }]}>
               {streakInfo.currentStreak}
             </Text>
@@ -216,112 +224,105 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
         </View>
       </View>
     </TouchableOpacity>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 20,
-    marginBottom: 16,
-    borderWidth: 1,
+    borderRadius: RADIUS.lg,
+    marginBottom: SPACING.md,
     overflow: 'hidden',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 5,
+    flexDirection: 'row',
   },
-  accentBar: {
-    height: 3,
-    width: '100%',
+  colorIndicator: {
+    width: 4,
+    borderTopLeftRadius: RADIUS.lg,
+    borderBottomLeftRadius: RADIUS.lg,
   },
   cardContent: {
-    padding: 18,
+    flex: 1,
+    padding: SPACING.lg,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-  },
-  iconContainer: {
-    marginRight: 14,
   },
   iconCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 15,
+    width: 44,
+    height: 44,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    marginRight: SPACING.md,
   },
   titleContainer: {
     flex: 1,
   },
   name: {
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    fontSize: 16,
+    fontFamily: FONT.semibold,
+    letterSpacing: -0.2,
   },
   description: {
     fontSize: 13,
-    marginTop: 3,
-    opacity: 0.8,
+    fontFamily: FONT.regular,
+    marginTop: 2,
   },
   checkButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    borderWidth: 2,
+    width: 36,
+    height: 36,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowOffset: { width: 0, height: 2 },
+    marginLeft: SPACING.sm,
     overflow: 'hidden',
   },
   pulseCircle: {
     position: 'absolute',
-    width: 38,
-    height: 38,
-    borderRadius: 12,
+    width: 36,
+    height: 36,
+    borderRadius: RADIUS.sm,
   },
   gridContainer: {
-    marginVertical: 12,
-    paddingVertical: 8,
+    marginTop: SPACING.md,
+    paddingVertical: SPACING.sm,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 12,
-    paddingTop: 14,
-    borderTopWidth: 1,
+    marginTop: SPACING.sm,
+    paddingTop: SPACING.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(150, 150, 150, 0.15)',
   },
   streakContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  streakIconWrapper: {
-    marginRight: 6,
+    gap: SPACING.xs,
   },
   streakText: {
-    fontSize: 17,
-    fontWeight: '700',
-    marginRight: 4,
+    fontSize: 15,
+    fontFamily: FONT.bold,
   },
   streakLabel: {
     fontSize: 13,
-    fontWeight: '500',
+    fontFamily: FONT.regular,
   },
   rateContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
+    gap: SPACING.xs,
   },
   rateValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginRight: 4,
+    fontSize: 15,
+    fontFamily: FONT.bold,
   },
   rateLabel: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 11,
+    fontFamily: FONT.medium,
   },
 });
 

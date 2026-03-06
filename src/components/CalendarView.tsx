@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  LayoutChangeEvent,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -17,6 +18,7 @@ import {
   getWeekDayHeaders,
 } from '../utils/dateUtils';
 import { format, isToday, isFuture } from 'date-fns';
+import { FONT, RADIUS, SPACING } from '../constants/theme';
 
 interface CalendarViewProps {
   habit: Habit;
@@ -36,6 +38,14 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   const { colors } = useTheme();
   const days = getMonthCalendarDays(currentMonth, weekStartsOn);
   const weekDayHeaders = getWeekDayHeaders(weekStartsOn);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  // Compute day circle size from container width: 7 columns with padding
+  const daySize = containerWidth > 0 ? Math.min(Math.floor((containerWidth - 16) / 7) - 4, 42) : 36;
+
+  const handleLayout = (event: LayoutChangeEvent) => {
+    setContainerWidth(event.nativeEvent.layout.width);
+  };
 
   const goToPreviousMonth = () => {
     const newDate = new Date(currentMonth);
@@ -50,7 +60,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onLayout={handleLayout}>
       <View style={styles.header}>
         <TouchableOpacity
           style={[styles.navButton, { backgroundColor: colors.surfaceVariant }]}
@@ -100,6 +110,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                 style={[
                   styles.dayCircle,
                   {
+                    width: daySize,
+                    height: daySize,
+                    borderRadius: daySize / 2,
                     backgroundColor: isCompleted
                       ? habit.color
                       : 'transparent',
@@ -133,37 +146,37 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: SPACING.lg,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: SPACING.lg,
   },
   navButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   monthText: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 17,
+    fontFamily: FONT.semibold,
   },
   weekDays: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
   },
   weekDayCell: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: SPACING.sm,
   },
   weekDayText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: FONT.semibold,
   },
   daysGrid: {
     flexDirection: 'row',
@@ -177,15 +190,12 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   dayCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   dayText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
 });
 

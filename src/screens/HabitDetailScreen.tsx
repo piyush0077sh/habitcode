@@ -14,6 +14,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useHabits } from '../context/HabitContext';
 import { CalendarView, ShareCard } from '../components';
 import { calculateStreak, getLastNDays } from '../utils/dateUtils';
+import { FONT, RADIUS, SPACING, hexToRgba } from '../constants/theme';
 
 const HabitDetailScreen = ({
   route,
@@ -116,7 +117,7 @@ const HabitDetailScreen = ({
           <View
             style={[
               styles.iconCircle,
-              { backgroundColor: habit.color + '20' },
+              { backgroundColor: hexToRgba(habit.color, 0.12) },
             ]}
           >
             <MaterialIcons
@@ -179,7 +180,7 @@ const HabitDetailScreen = ({
 
         <View style={styles.actionsContainer}>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: habit.color + '15' }]}
+            style={[styles.actionButton, { backgroundColor: hexToRgba(habit.color, 0.1) }]}
             onPress={() => setShowShareModal(true)}
           >
             <MaterialIcons name="share" size={20} color={habit.color} />
@@ -213,7 +214,7 @@ const HabitDetailScreen = ({
           <TouchableOpacity
             style={[
               styles.actionButton,
-              { backgroundColor: colors.error + '10' },
+              { backgroundColor: hexToRgba(colors.error, 0.08) },
             ]}
             onPress={handleDelete}
           >
@@ -250,81 +251,83 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
+    padding: SPACING.xl,
   },
   habitHeader: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: SPACING.xxl,
   },
   iconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: SPACING.lg,
   },
   habitName: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: 22,
+    fontFamily: FONT.bold,
     textAlign: 'center',
   },
   habitDescription: {
     fontSize: 15,
+    fontFamily: FONT.regular,
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 20,
+    gap: SPACING.md,
+    marginBottom: SPACING.xl,
   },
   statCard: {
     flex: 1,
     minWidth: '45%',
-    padding: 16,
-    borderRadius: 16,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.lg,
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   statValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginTop: 8,
+    fontSize: 22,
+    fontFamily: FONT.bold,
+    marginTop: SPACING.sm,
   },
   statLabel: {
     fontSize: 12,
-    marginTop: 4,
+    fontFamily: FONT.medium,
+    marginTop: SPACING.xs,
   },
   calendarContainer: {
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: 20,
+    borderRadius: RADIUS.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    marginBottom: SPACING.xl,
   },
   actionsContainer: {
-    gap: 10,
+    gap: SPACING.sm,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    gap: 12,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.md,
+    gap: SPACING.md,
   },
   actionText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: SPACING.xl,
   },
   modalContent: {
-    borderRadius: 20,
+    borderRadius: RADIUS.xl,
     overflow: 'hidden',
     width: '100%',
     maxWidth: 400,

@@ -7,6 +7,7 @@ import {
   TextInputProps as RNTextInputProps,
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import { FONT, RADIUS, SPACING } from '../constants/theme';
 
 interface TextInputProps extends RNTextInputProps {
   label: string;
@@ -24,19 +25,19 @@ const TextInput: React.FC<TextInputProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
+      <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
       <RNTextInput
         style={[
           styles.input,
           {
             backgroundColor: colors.surfaceVariant,
             color: colors.text,
-            borderColor: error ? colors.error : isFocused ? colors.primary : colors.border,
-            borderWidth: isFocused ? 2 : 1,
+            borderColor: error ? colors.error : isFocused ? colors.primary : 'transparent',
+            borderWidth: 1,
           },
           style,
         ]}
-        placeholderTextColor={colors.textSecondary + '90'}
+        placeholderTextColor={colors.textSecondary}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         {...props}
@@ -50,23 +51,25 @@ const TextInput: React.FC<TextInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
+    marginVertical: SPACING.sm,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 10,
-    letterSpacing: -0.3,
+    fontSize: 13,
+    fontFamily: FONT.semibold,
+    marginBottom: SPACING.sm,
+    letterSpacing: 0.2,
+    textTransform: 'uppercase',
   },
   input: {
-    borderRadius: 14,
-    padding: 16,
-    fontSize: 16,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
+    fontSize: 15,
+    fontFamily: FONT.regular,
   },
   error: {
     fontSize: 13,
-    marginTop: 6,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
+    marginTop: SPACING.xs,
   },
 });
 

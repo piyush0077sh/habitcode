@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -6,8 +6,10 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  Animated,
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import { FONT, RADIUS, SPACING, SHADOW } from '../constants/theme';
 
 interface ButtonProps {
   title: string;
@@ -29,6 +31,25 @@ const Button: React.FC<ButtonProps> = ({
   textStyle,
 }) => {
   const { colors } = useTheme();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = useCallback(() => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  }, [scaleAnim]);
+
+  const handlePressOut = useCallback(() => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 40,
+      bounciness: 6,
+    }).start();
+  }, [scaleAnim]);
 
   const getBackgroundColor = () => {
     if (disabled) return colors.disabled;
@@ -57,58 +78,46 @@ const Button: React.FC<ButtonProps> = ({
     }
   };
 
-  const getShadowColor = () => {
-    switch (variant) {
-      case 'primary':
-        return colors.primary;
-      case 'danger':
-        return colors.error;
-      default:
-        return 'transparent';
-    }
-  };
-
   return (
-    <TouchableOpacity
-      style={[
-        styles.button,
-        { 
-          backgroundColor: getBackgroundColor(),
-          shadowColor: disabled ? 'transparent' : getShadowColor(),
-        },
-        style,
-      ]}
-      onPress={onPress}
-      disabled={disabled || loading}
-      activeOpacity={0.85}
-    >
-      {loading ? (
-        <ActivityIndicator color={getTextColor()} size="small" />
-      ) : (
-        <Text style={[styles.text, { color: getTextColor() }, textStyle]}>
-          {title}
-        </Text>
-      )}
-    </TouchableOpacity>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        style={[
+          styles.button,
+          { backgroundColor: getBackgroundColor() },
+          !disabled && SHADOW.md,
+          style,
+        ]}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={disabled || loading}
+        activeOpacity={0.8}
+      >
+        {loading ? (
+          <ActivityIndicator color={getTextColor()} size="small" />
+        ) : (
+          <Text style={[styles.text, { color: getTextColor() }, textStyle]}>
+            {title}
+          </Text>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 16,
-    padding: 18,
+    borderRadius: RADIUS.md,
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.xl,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 56,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 6,
+    minHeight: 52,
   },
   text: {
-    fontSize: 17,
-    fontWeight: '700',
-    letterSpacing: 0.3,
+    fontSize: 16,
+    fontFamily: FONT.semibold,
+    letterSpacing: 0,
   },
 });
 

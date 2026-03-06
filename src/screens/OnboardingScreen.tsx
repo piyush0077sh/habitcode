@@ -1,21 +1,19 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
   FlatList,
   Animated,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
-import { STORAGE_KEYS } from '../constants/theme';
-
-const { width, height } = Dimensions.get('window');
+import { STORAGE_KEYS, FONT, RADIUS, SPACING, SHADOW, hexToRgba } from '../constants/theme';
 
 interface OnboardingScreenProps {
   navigation: any;
@@ -50,7 +48,7 @@ const onboardingData: OnboardingItem[] = [
     icon: 'grid-view',
     title: 'See the Big Picture',
     description: 'Get your completions visualized in a beautiful tile grid',
-    color: '#f97316',
+    color: '#818cf8',
   },
   {
     id: '4',
@@ -91,9 +89,29 @@ const onboardingData: OnboardingItem[] = [
 
 const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onComplete }) => {
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+  const buttonScaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handleButtonPressIn = useCallback(() => {
+    Animated.spring(buttonScaleAnim, {
+      toValue: 0.93,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  }, [buttonScaleAnim]);
+
+  const handleButtonPressOut = useCallback(() => {
+    Animated.spring(buttonScaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+      bounciness: 10,
+    }).start();
+  }, [buttonScaleAnim]);
 
   const handleComplete = async () => {
     await AsyncStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETE, 'true');
@@ -141,7 +159,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
           style={[
             styles.iconContainer,
             {
-              backgroundColor: item.color + '20',
+              backgroundColor: hexToRgba(item.color, 0.12),
               transform: [{ scale }],
               opacity,
             },
@@ -250,9 +268,12 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
 
         {/* Button */}
         <View style={styles.buttonContainer}>
+          <Animated.View style={{ transform: [{ scale: buttonScaleAnim }] }}>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: colors.primary }]}
             onPress={handleNext}
+            onPressIn={handleButtonPressIn}
+            onPressOut={handleButtonPressOut}
             activeOpacity={0.8}
           >
             <Text style={styles.buttonText}>
@@ -264,6 +285,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
               color="#fff"
             />
           </TouchableOpacity>
+          </Animated.View>
         </View>
       </SafeAreaView>
     </LinearGradient>
@@ -281,20 +303,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.lg,
   },
   logoContainer: {
     flex: 1,
   },
   logoText: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 26,
+    fontFamily: FONT.bold,
     letterSpacing: -0.5,
   },
   skipText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
   slide: {
     flex: 1,
@@ -303,58 +325,55 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   iconContainer: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
+    width: 144,
+    height: 144,
+    borderRadius: 72,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 40,
+    marginBottom: SPACING.xxxl + 8,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 26,
+    fontFamily: FONT.bold,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: SPACING.lg,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: 17,
+    fontSize: 16,
+    fontFamily: FONT.regular,
     textAlign: 'center',
-    lineHeight: 26,
-    paddingHorizontal: 20,
+    lineHeight: 24,
+    paddingHorizontal: SPACING.xl,
   },
   dotsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 30,
+    paddingVertical: SPACING.xxl + 6,
   },
   dot: {
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
+    height: 6,
+    borderRadius: 3,
+    marginHorizontal: 3,
   },
   buttonContainer: {
-    paddingHorizontal: 24,
-    paddingBottom: 32,
+    paddingHorizontal: SPACING.xl,
+    paddingBottom: SPACING.xxxl,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    borderRadius: 16,
-    gap: 8,
-    shadowColor: '#7c3aed',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    gap: SPACING.sm,
+    ...SHADOW.md,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontFamily: FONT.semibold,
   },
 });
 

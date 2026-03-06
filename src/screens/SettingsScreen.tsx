@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Alert,
   Linking,
   Platform,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -18,7 +19,7 @@ import { usePremium } from '../context/PremiumContext';
 import { Logo } from '../components';
 import { ThemeMode } from '../types';
 import { exportData, importData, clearAllData } from '../utils/storage';
-import { ACCENT_COLORS, GRADIENT_BACKGROUNDS } from '../constants/theme';
+import { ACCENT_COLORS, GRADIENT_BACKGROUNDS, FONT, RADIUS, SPACING, hexToRgba } from '../constants/theme';
 
 interface SettingsScreenProps {
   navigation: any;
@@ -148,7 +149,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                     onPress: () => {
                       navigation.reset({
                         index: 0,
-                        routes: [{ name: 'Home' }],
+                        routes: [{ name: 'MainTabs' }],
                       });
                     },
                   },
@@ -171,19 +172,44 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
     onPress?: () => void;
     rightElement?: React.ReactNode;
     danger?: boolean;
-  }> = ({ icon, title, subtitle, onPress, rightElement, danger }) => (
+  }> = ({ icon, title, subtitle, onPress, rightElement, danger }) => {
+    const rowScale = useRef(new Animated.Value(1)).current;
+
+    const handleRowPressIn = useCallback(() => {
+      Animated.spring(rowScale, {
+        toValue: 0.97,
+        useNativeDriver: true,
+        speed: 50,
+        bounciness: 4,
+      }).start();
+    }, [rowScale]);
+
+    const handleRowPressOut = useCallback(() => {
+      Animated.spring(rowScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 40,
+        bounciness: 6,
+      }).start();
+    }, [rowScale]);
+
+    return (
+    <Animated.View style={{ transform: [{ scale: rowScale }] }}>
     <TouchableOpacity
       style={[styles.settingRow, { backgroundColor: colors.surface }]}
       onPress={onPress}
+      onPressIn={handleRowPressIn}
+      onPressOut={handleRowPressOut}
       disabled={!onPress && !rightElement}
+      activeOpacity={0.8}
     >
       <View
         style={[
           styles.iconCircle,
           {
             backgroundColor: danger
-              ? colors.error + '20'
-              : colors.primary + '20',
+              ? hexToRgba(colors.error, 0.12)
+              : hexToRgba(colors.primary, 0.12),
           },
         ]}
       >
@@ -216,7 +242,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         />
       )}
     </TouchableOpacity>
-  );
+    </Animated.View>
+    );
+  };
 
   const ThemeOption: React.FC<{
     mode: ThemeMode;
@@ -228,7 +256,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         styles.themeOption,
         {
           backgroundColor:
-            themeMode === mode ? colors.primary + '20' : colors.surfaceVariant,
+            themeMode === mode ? hexToRgba(colors.primary, 0.12) : colors.surfaceVariant,
           borderColor: themeMode === mode ? colors.primary : 'transparent',
         },
       ]}
@@ -267,7 +295,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           style={[
             styles.premiumBanner,
             {
-              backgroundColor: isPremium ? colors.success + '15' : '#FFD700' + '15',
+              backgroundColor: isPremium ? hexToRgba(colors.success, 0.1) : hexToRgba('#FFD700', 0.1),
               borderColor: isPremium ? colors.success : '#FFD700',
             },
           ]}
@@ -424,7 +452,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   <View
                     style={[
                       styles.habitIcon,
-                      { backgroundColor: habit.color + '20' },
+                    { backgroundColor: hexToRgba(habit.color, 0.12) },
                     ]}
                   >
                     <MaterialIcons
@@ -522,67 +550,68 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
-    paddingTop: 16,
+    padding: SPACING.xl,
+    paddingTop: SPACING.lg,
   },
   sectionHeader: {
     fontSize: 12,
-    fontWeight: '700',
-    marginBottom: 12,
-    marginTop: 20,
+    fontFamily: FONT.semibold,
+    marginBottom: SPACING.md,
+    marginTop: SPACING.xl,
     letterSpacing: 1,
   },
   premiumBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 18,
-    borderRadius: 18,
-    borderWidth: 2,
-    gap: 14,
-    marginBottom: 8,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1.5,
+    gap: SPACING.md,
+    marginBottom: SPACING.sm,
   },
   premiumBannerContent: {
     flex: 1,
   },
   premiumBannerTitle: {
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 16,
+    fontFamily: FONT.bold,
   },
   premiumBannerSubtitle: {
     fontSize: 13,
+    fontFamily: FONT.regular,
     marginTop: 2,
   },
   section: {
     gap: 2,
-    borderRadius: 18,
+    borderRadius: RADIUS.lg,
     overflow: 'hidden',
   },
   themeContainer: {
     flexDirection: 'row',
-    gap: 12,
+    gap: SPACING.md,
   },
   themeOption: {
     flex: 1,
-    padding: 18,
-    borderRadius: 16,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
-    borderWidth: 2,
-    gap: 10,
+    borderWidth: 1.5,
+    gap: SPACING.sm,
   },
   themeText: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONT.semibold,
   },
   settingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    gap: 14,
+    padding: SPACING.lg,
+    gap: SPACING.md,
   },
   iconCircle: {
     width: 40,
     height: 40,
-    borderRadius: 12,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -591,77 +620,77 @@ const styles = StyleSheet.create({
   },
   settingTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: FONT.semibold,
     letterSpacing: -0.2,
   },
   settingSubtitle: {
     fontSize: 13,
+    fontFamily: FONT.regular,
     marginTop: 3,
-    opacity: 0.8,
   },
   archivedHabit: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    gap: 14,
+    padding: SPACING.lg,
+    gap: SPACING.md,
   },
   habitIcon: {
     width: 40,
     height: 40,
-    borderRadius: 12,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   habitName: {
     flex: 1,
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: FONT.semibold,
   },
   privacyNote: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginTop: 32,
-    padding: 18,
-    gap: 14,
-    borderRadius: 16,
+    marginTop: SPACING.xxxl,
+    padding: SPACING.lg,
+    gap: SPACING.md,
+    borderRadius: RADIUS.lg,
   },
   privacyText: {
     flex: 1,
     fontSize: 13,
+    fontFamily: FONT.regular,
     lineHeight: 20,
-    opacity: 0.9,
   },
   footer: {
     textAlign: 'center',
     fontSize: 13,
-    marginTop: 24,
-    marginBottom: 16,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
+    marginTop: SPACING.xxl,
+    marginBottom: SPACING.lg,
   },
   logoSection: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
-    borderRadius: 16,
-    marginBottom: 8,
+    padding: SPACING.xxl,
+    borderRadius: RADIUS.lg,
+    marginBottom: SPACING.sm,
   },
   versionText: {
-    marginTop: 12,
+    marginTop: SPACING.md,
     fontSize: 13,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
   subsectionHeader: {
     fontSize: 15,
-    fontWeight: '600',
-    marginTop: 16,
-    marginBottom: 12,
-    marginLeft: 4,
+    fontFamily: FONT.semibold,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.md,
+    marginLeft: SPACING.xs,
   },
   colorPickerScroll: {
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
   },
   colorPickerContent: {
-    gap: 10,
+    gap: SPACING.sm,
   },
   accentColorOption: {
     width: 44,
@@ -671,15 +700,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   gradientOption: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.md,
     minWidth: 80,
     alignItems: 'center',
   },
   gradientLabel: {
     fontSize: 12,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
 });
 

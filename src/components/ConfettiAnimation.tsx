@@ -1,14 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Dimensions } from 'react-native';
+import { View, StyleSheet, Animated, useWindowDimensions } from 'react-native';
 
 interface ConfettiAnimationProps {
   visible: boolean;
   onComplete?: () => void;
 }
 
-const { width, height } = Dimensions.get('window');
 const CONFETTI_COUNT = 30;
-const COLORS = ['#f97316', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#f59e0b', '#06b6d4'];
+const COLORS = ['#818cf8', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#f59e0b', '#06b6d4'];
 
 interface ConfettiPiece {
   x: Animated.Value;
@@ -20,10 +19,11 @@ interface ConfettiPiece {
 }
 
 export const ConfettiAnimation: React.FC<ConfettiAnimationProps> = ({ visible, onComplete }) => {
+  const { width, height } = useWindowDimensions();
   const confettiPieces = useRef<ConfettiPiece[]>(
     Array.from({ length: CONFETTI_COUNT }, () => ({
-      x: new Animated.Value(width / 2),
-      y: new Animated.Value(height / 2),
+      x: new Animated.Value(0),
+      y: new Animated.Value(0),
       rotate: new Animated.Value(0),
       opacity: new Animated.Value(1),
       color: COLORS[Math.floor(Math.random() * COLORS.length)],

@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -12,12 +12,12 @@ import { BarChart, PieChart } from 'react-native-gifted-charts';
 import { useTheme } from '../context/ThemeContext';
 import { useHabits } from '../context/HabitContext';
 import { formatDate } from '../utils/dateUtils';
-
-const { width } = Dimensions.get('window');
+import { FONT, RADIUS, SPACING, SHADOW, hexToRgba } from '../constants/theme';
 
 const StatsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { colors } = useTheme();
   const { activeHabits, habits } = useHabits();
+  const { width } = useWindowDimensions();
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -121,15 +121,15 @@ const StatsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   // Pie chart data for categories
   const categoryColors: { [key: string]: string } = {
-    health: '#ef4444',
-    fitness: '#f97316',
-    work: '#3b82f6',
-    learning: '#8b5cf6',
-    personal: '#06b6d4',
-    finance: '#22c55e',
-    social: '#ec4899',
-    mindfulness: '#a855f7',
-    other: '#6b7280',
+    health: '#ef6b6b',
+    fitness: '#f09a5c',
+    work: '#5ca8f0',
+    learning: '#7c8cf0',
+    personal: '#47b8b8',
+    finance: '#6ec96e',
+    social: '#f06b9a',
+    mindfulness: '#a67df0',
+    other: '#8e8e93',
   };
 
   const pieChartData = Object.entries(stats.categoryData).map(([cat, value]) => ({
@@ -144,8 +144,8 @@ const StatsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     value: string | number;
     color: string;
   }> = ({ icon, label, value, color }) => (
-    <View style={[styles.statCard, { backgroundColor: colors.surface }]}>
-      <View style={[styles.statIconContainer, { backgroundColor: color + '20' }]}>
+    <View style={[styles.statCard, { backgroundColor: colors.surface, width: (width - 44) / 2 }]}>
+      <View style={[styles.statIconContainer, { backgroundColor: hexToRgba(color, 0.12) }]}>
         <MaterialIcons name={icon as any} size={24} color={color} />
       </View>
       <Text style={[styles.statValue, { color: colors.text }]}>{value}</Text>
@@ -169,19 +169,19 @@ const StatsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             icon="check-circle"
             label="Total Done"
             value={stats.totalCompletions}
-            color="#22c55e"
+            color="#6ec96e"
           />
           <StatCard
             icon="today"
             label="This Week"
             value={stats.weeklyCompletions}
-            color="#3b82f6"
+            color="#5ca8f0"
           />
           <StatCard
             icon="local-fire-department"
             label="Best Streak"
             value={stats.bestStreak}
-            color="#f97316"
+            color="#f09a5c"
           />
           <StatCard
             icon="speed"
@@ -298,50 +298,50 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    padding: SPACING.lg,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 16,
+    gap: SPACING.md,
+    marginBottom: SPACING.lg,
   },
   statCard: {
-    width: (width - 44) / 2,
-    padding: 16,
-    borderRadius: 16,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.lg,
     alignItems: 'center',
   },
   statIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
   statValue: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: 26,
+    fontFamily: FONT.bold,
+    marginBottom: SPACING.xs,
   },
   statLabel: {
     fontSize: 13,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
   chartContainer: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    marginBottom: SPACING.lg,
   },
   chartTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: 17,
+    fontFamily: FONT.bold,
+    marginBottom: SPACING.xs,
   },
   chartSubtitle: {
     fontSize: 13,
-    marginBottom: 20,
+    fontFamily: FONT.regular,
+    marginBottom: SPACING.xl,
   },
   chartWrapper: {
     alignItems: 'center',
@@ -353,56 +353,59 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pieCenterValue: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: 22,
+    fontFamily: FONT.bold,
   },
   pieCenterLabel: {
     fontSize: 11,
+    fontFamily: FONT.regular,
   },
   legend: {
-    marginTop: 20,
+    marginTop: SPACING.xl,
     width: '100%',
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
   },
   legendColor: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 8,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: SPACING.sm,
   },
   legendText: {
     flex: 1,
     fontSize: 14,
+    fontFamily: FONT.regular,
   },
   legendValue: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: FONT.semibold,
   },
   quickStats: {
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.lg,
   },
   quickStatRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: SPACING.md,
   },
   quickStatLabel: {
     flex: 1,
     fontSize: 15,
+    fontFamily: FONT.regular,
   },
   quickStatValue: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontFamily: FONT.bold,
   },
   divider: {
-    height: 1,
-    marginVertical: 12,
+    height: StyleSheet.hairlineWidth,
+    marginVertical: SPACING.md,
   },
 });
 

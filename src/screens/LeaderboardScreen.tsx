@@ -17,6 +17,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useHabits } from '../context/HabitContext';
 import { UserStats, Friend, LeaderboardEntry } from '../types';
+import { FONT, RADIUS, SPACING, SHADOW, hexToRgba } from '../constants/theme';
 import {
   calculateUserStats,
   getFriends,
@@ -185,269 +186,13 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
     return `#${rank}`;
   };
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: 16,
-      paddingTop: 8,
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: 'bold',
-      color: colors.text,
-    },
-    headerButtons: {
-      flexDirection: 'row',
-      gap: 8,
-    },
-    iconButton: {
-      padding: 8,
-      backgroundColor: colors.surface,
-      borderRadius: 12,
-    },
-    myStatsCard: {
-      backgroundColor: colors.primary,
-      margin: 16,
-      marginTop: 0,
-      borderRadius: 16,
-      padding: 16,
-    },
-    myStatsHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 12,
-    },
-    myName: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: '#fff',
-    },
-    myCode: {
-      fontSize: 12,
-      color: 'rgba(255,255,255,0.7)',
-      marginTop: 2,
-    },
-    editNameButton: {
-      padding: 4,
-    },
-    myStatsRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-    },
-    statItem: {
-      alignItems: 'center',
-    },
-    statValue: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: '#fff',
-    },
-    statLabel: {
-      fontSize: 12,
-      color: 'rgba(255,255,255,0.8)',
-      marginTop: 2,
-    },
-    shareButtons: {
-      flexDirection: 'row',
-      marginTop: 16,
-      gap: 8,
-    },
-    shareButton: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'rgba(255,255,255,0.2)',
-      padding: 12,
-      borderRadius: 12,
-      gap: 6,
-    },
-    shareButtonText: {
-      color: '#fff',
-      fontWeight: '600',
-    },
-    sortContainer: {
-      flexDirection: 'row',
-      paddingHorizontal: 16,
-      marginBottom: 8,
-      gap: 8,
-    },
-    sortButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 20,
-      gap: 4,
-    },
-    sortButtonActive: {
-      backgroundColor: colors.primary,
-    },
-    sortButtonInactive: {
-      backgroundColor: colors.surface,
-    },
-    sortText: {
-      fontSize: 13,
-      fontWeight: '500',
-    },
-    sortTextActive: {
-      color: '#fff',
-    },
-    sortTextInactive: {
-      color: colors.textSecondary,
-    },
-    leaderboardCard: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.surface,
-      marginHorizontal: 16,
-      marginVertical: 4,
-      padding: 12,
-      borderRadius: 12,
-    },
-    leaderboardCardMe: {
-      borderWidth: 2,
-      borderColor: colors.primary,
-    },
-    rank: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      width: 40,
-      textAlign: 'center',
-    },
-    friendInfo: {
-      flex: 1,
-      marginLeft: 8,
-    },
-    friendName: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: colors.text,
-    },
-    friendMeta: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      marginTop: 2,
-    },
-    friendStats: {
-      alignItems: 'flex-end',
-    },
-    friendStatValue: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: colors.primary,
-    },
-    friendStatLabel: {
-      fontSize: 11,
-      color: colors.textSecondary,
-    },
-    emptyState: {
-      alignItems: 'center',
-      padding: 40,
-    },
-    emptyText: {
-      fontSize: 16,
-      color: colors.textSecondary,
-      textAlign: 'center',
-      marginTop: 16,
-    },
-    addButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.primary,
-      paddingHorizontal: 20,
-      paddingVertical: 12,
-      borderRadius: 25,
-      marginTop: 20,
-      gap: 8,
-    },
-    addButtonText: {
-      color: '#fff',
-      fontWeight: '600',
-      fontSize: 16,
-    },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      justifyContent: 'center',
-      padding: 20,
-    },
-    modalContent: {
-      backgroundColor: colors.surface,
-      borderRadius: 20,
-      padding: 20,
-    },
-    modalTitle: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: colors.text,
-      marginBottom: 16,
-    },
-    modalInput: {
-      backgroundColor: colors.background,
-      borderRadius: 12,
-      padding: 16,
-      fontSize: 14,
-      color: colors.text,
-      minHeight: 100,
-      textAlignVertical: 'top',
-    },
-    modalNameInput: {
-      backgroundColor: colors.background,
-      borderRadius: 12,
-      padding: 16,
-      fontSize: 16,
-      color: colors.text,
-    },
-    modalButtons: {
-      flexDirection: 'row',
-      marginTop: 16,
-      gap: 12,
-    },
-    modalButton: {
-      flex: 1,
-      padding: 14,
-      borderRadius: 12,
-      alignItems: 'center',
-    },
-    modalButtonCancel: {
-      backgroundColor: colors.background,
-    },
-    modalButtonConfirm: {
-      backgroundColor: colors.primary,
-    },
-    modalButtonText: {
-      fontWeight: '600',
-      fontSize: 16,
-    },
-    modalButtonTextCancel: {
-      color: colors.textSecondary,
-    },
-    modalButtonTextConfirm: {
-      color: '#fff',
-    },
-    hint: {
-      fontSize: 13,
-      color: colors.textSecondary,
-      marginTop: 8,
-      marginBottom: 8,
-    },
-  });
-
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <Text style={styles.title}>Leaderboard</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Leaderboard</Text>
         <View style={styles.headerButtons}>
           <TouchableOpacity 
-            style={styles.iconButton}
+            style={[styles.iconButton, { backgroundColor: colors.surface }]}
             onPress={() => setShowAddModal(true)}
           >
             <MaterialIcons name="person-add" size={24} color={colors.primary} />
@@ -462,7 +207,7 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
       >
         {/* My Stats Card */}
         {myStats && (
-          <View style={styles.myStatsCard}>
+          <View style={[styles.myStatsCard, { backgroundColor: colors.primary }]}>
             <View style={styles.myStatsHeader}>
               <View>
                 <Text style={styles.myName}>{myStats.displayName}</Text>
@@ -509,7 +254,7 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
           <TouchableOpacity
             style={[
               styles.sortButton,
-              sortBy === 'completions' ? styles.sortButtonActive : styles.sortButtonInactive
+              { backgroundColor: sortBy === 'completions' ? colors.primary : colors.surface },
             ]}
             onPress={() => setSortBy('completions')}
           >
@@ -520,7 +265,7 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
             />
             <Text style={[
               styles.sortText,
-              sortBy === 'completions' ? styles.sortTextActive : styles.sortTextInactive
+              { color: sortBy === 'completions' ? '#fff' : colors.textSecondary },
             ]}>
               Completions
             </Text>
@@ -528,7 +273,7 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
           <TouchableOpacity
             style={[
               styles.sortButton,
-              sortBy === 'streak' ? styles.sortButtonActive : styles.sortButtonInactive
+              { backgroundColor: sortBy === 'streak' ? colors.primary : colors.surface },
             ]}
             onPress={() => setSortBy('streak')}
           >
@@ -539,7 +284,7 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
             />
             <Text style={[
               styles.sortText,
-              sortBy === 'streak' ? styles.sortTextActive : styles.sortTextInactive
+              { color: sortBy === 'streak' ? '#fff' : colors.textSecondary },
             ]}>
               Streak
             </Text>
@@ -550,12 +295,12 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
         {leaderboard.length === 1 ? (
           <View style={styles.emptyState}>
             <MaterialIcons name="group" size={64} color={colors.textSecondary} />
-            <Text style={styles.emptyText}>
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               Add friends to compete on the leaderboard!{'\n'}
               Share your code and add theirs.
             </Text>
             <TouchableOpacity 
-              style={styles.addButton}
+              style={[styles.addButton, { backgroundColor: colors.primary }]}
               onPress={() => setShowAddModal(true)}
             >
               <MaterialIcons name="person-add" size={20} color="#fff" />
@@ -568,25 +313,26 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
               key={entry.friendCode}
               style={[
                 styles.leaderboardCard,
-                entry.isMe && styles.leaderboardCardMe
+                { backgroundColor: colors.surface },
+                entry.isMe && { borderWidth: 1.5, borderColor: colors.primary },
               ]}
               onLongPress={() => !entry.isMe && handleRemoveFriend(entry)}
               delayLongPress={500}
             >
               <Text style={styles.rank}>{getRankEmoji(entry.rank)}</Text>
               <View style={styles.friendInfo}>
-                <Text style={styles.friendName}>
+                <Text style={[styles.friendName, { color: colors.text }]}>
                   {entry.displayName} {entry.isMe && '(You)'}
                 </Text>
-                <Text style={styles.friendMeta}>
+                <Text style={[styles.friendMeta, { color: colors.textSecondary }]}>
                   {entry.activeHabits} habits • 🔥 {entry.longestStreakBest} longest
                 </Text>
               </View>
               <View style={styles.friendStats}>
-                <Text style={styles.friendStatValue}>
+                <Text style={[styles.friendStatValue, { color: colors.primary }]}>
                   {sortBy === 'completions' ? entry.totalCompletions : entry.currentStreakBest}
                 </Text>
-                <Text style={styles.friendStatLabel}>
+                <Text style={[styles.friendStatLabel, { color: colors.textSecondary }]}>
                   {sortBy === 'completions' ? 'completions' : 'day streak'}
                 </Text>
               </View>
@@ -594,7 +340,7 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
           ))
         )}
         
-        <View style={{ height: 100 }} />
+        <View style={{ height: 20 }} />
       </ScrollView>
 
       {/* Add Friend Modal */}
@@ -605,13 +351,13 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
         onRequestClose={() => setShowAddModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add Friend</Text>
-            <Text style={styles.hint}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Add Friend</Text>
+            <Text style={[styles.hint, { color: colors.textSecondary }]}>
               Paste the friend code that was shared with you:
             </Text>
             <TextInput
-              style={styles.modalInput}
+              style={[styles.modalInput, { backgroundColor: colors.background, color: colors.text }]}
               placeholder="Paste HABITCODE:... here"
               placeholderTextColor={colors.textSecondary}
               value={friendCodeInput}
@@ -620,21 +366,21 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
             />
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonCancel]}
+                style={[styles.modalButton, { backgroundColor: colors.background }]}
                 onPress={() => {
                   setShowAddModal(false);
                   setFriendCodeInput('');
                 }}
               >
-                <Text style={[styles.modalButtonText, styles.modalButtonTextCancel]}>
+                <Text style={[styles.modalButtonText, { color: colors.textSecondary }]}>
                   Cancel
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonConfirm]}
+                style={[styles.modalButton, { backgroundColor: colors.primary }]}
                 onPress={handleAddFriend}
               >
-                <Text style={[styles.modalButtonText, styles.modalButtonTextConfirm]}>
+                <Text style={[styles.modalButtonText, { color: '#fff' }]}>
                   Add
                 </Text>
               </TouchableOpacity>
@@ -651,10 +397,10 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
         onRequestClose={() => setShowEditNameModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Edit Display Name</Text>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Edit Display Name</Text>
             <TextInput
-              style={styles.modalNameInput}
+              style={[styles.modalNameInput, { backgroundColor: colors.background, color: colors.text }]}
               placeholder="Your name"
               placeholderTextColor={colors.textSecondary}
               value={nameInput}
@@ -663,18 +409,18 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
             />
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonCancel]}
+                style={[styles.modalButton, { backgroundColor: colors.background }]}
                 onPress={() => setShowEditNameModal(false)}
               >
-                <Text style={[styles.modalButtonText, styles.modalButtonTextCancel]}>
+                <Text style={[styles.modalButtonText, { color: colors.textSecondary }]}>
                   Cancel
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, styles.modalButtonConfirm]}
+                style={[styles.modalButton, { backgroundColor: colors.primary }]}
                 onPress={handleSaveName}
               >
-                <Text style={[styles.modalButtonText, styles.modalButtonTextConfirm]}>
+                <Text style={[styles.modalButtonText, { color: '#fff' }]}>
                   Save
                 </Text>
               </TouchableOpacity>
@@ -685,5 +431,225 @@ const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ navigation }) => 
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: SPACING.lg,
+    paddingTop: SPACING.sm,
+  },
+  title: {
+    fontSize: 26,
+    fontFamily: FONT.bold,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+  },
+  iconButton: {
+    padding: SPACING.sm,
+    borderRadius: RADIUS.md,
+  },
+  myStatsCard: {
+    marginHorizontal: SPACING.lg,
+    marginTop: 0,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+  },
+  myStatsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  myName: {
+    fontSize: 20,
+    fontFamily: FONT.bold,
+    color: '#fff',
+  },
+  myCode: {
+    fontSize: 12,
+    fontFamily: FONT.regular,
+    color: 'rgba(255,255,255,0.7)',
+    marginTop: 2,
+  },
+  editNameButton: {
+    padding: SPACING.xs,
+  },
+  myStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 22,
+    fontFamily: FONT.bold,
+    color: '#fff',
+  },
+  statLabel: {
+    fontSize: 12,
+    fontFamily: FONT.regular,
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: 2,
+  },
+  shareButtons: {
+    flexDirection: 'row',
+    marginTop: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  shareButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    gap: SPACING.xs,
+  },
+  shareButtonText: {
+    color: '#fff',
+    fontFamily: FONT.semibold,
+    fontSize: 14,
+  },
+  sortContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: SPACING.lg,
+    marginVertical: SPACING.md,
+    gap: SPACING.sm,
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs + 2,
+    borderRadius: RADIUS.full,
+    gap: SPACING.xs,
+  },
+  sortText: {
+    fontSize: 13,
+    fontFamily: FONT.medium,
+  },
+  leaderboardCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: SPACING.lg,
+    marginVertical: SPACING.xs,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+  },
+  rank: {
+    fontSize: 20,
+    fontFamily: FONT.bold,
+    width: 40,
+    textAlign: 'center',
+  },
+  friendInfo: {
+    flex: 1,
+    marginLeft: SPACING.sm,
+  },
+  friendName: {
+    fontSize: 16,
+    fontFamily: FONT.semibold,
+  },
+  friendMeta: {
+    fontSize: 12,
+    fontFamily: FONT.regular,
+    marginTop: 2,
+  },
+  friendStats: {
+    alignItems: 'flex-end',
+  },
+  friendStatValue: {
+    fontSize: 17,
+    fontFamily: FONT.bold,
+  },
+  friendStatLabel: {
+    fontSize: 11,
+    fontFamily: FONT.regular,
+  },
+  emptyState: {
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    fontSize: 15,
+    fontFamily: FONT.regular,
+    textAlign: 'center',
+    marginTop: SPACING.lg,
+    lineHeight: 22,
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.full,
+    marginTop: SPACING.xl,
+    gap: SPACING.sm,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontFamily: FONT.semibold,
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: SPACING.xl,
+  },
+  modalContent: {
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: FONT.bold,
+    marginBottom: SPACING.lg,
+  },
+  modalInput: {
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
+    fontSize: 14,
+    fontFamily: FONT.regular,
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+  modalNameInput: {
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
+    fontSize: 16,
+    fontFamily: FONT.regular,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    marginTop: SPACING.lg,
+    gap: SPACING.md,
+  },
+  modalButton: {
+    flex: 1,
+    padding: SPACING.md + 2,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    fontFamily: FONT.semibold,
+    fontSize: 16,
+  },
+  hint: {
+    fontSize: 13,
+    fontFamily: FONT.regular,
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.sm,
+  },
+});
 
 export default LeaderboardScreen;

@@ -14,6 +14,7 @@ import * as FileSystem from 'expo-file-system';
 import { useTheme } from '../context/ThemeContext';
 import { Habit } from '../types';
 import { calculateStreak } from '../utils/dateUtils';
+import { FONT, RADIUS, SPACING, hexToRgba } from '../constants/theme';
 
 interface ShareCardProps {
   habit: Habit;
@@ -69,10 +70,10 @@ export const ShareCard: React.FC<ShareCardProps> = ({ habit, onClose }) => {
           result: 'tmpfile',
         }}
       >
-        <View style={[styles.card, { backgroundColor: '#0f0f1a' }]}>
+        <View style={[styles.card, { backgroundColor: '#1a1a1a' }]}>
           {/* Header */}
           <View style={styles.header}>
-            <View style={[styles.iconContainer, { backgroundColor: habit.color + '20' }]}>
+            <View style={[styles.iconContainer, { backgroundColor: hexToRgba(habit.color, 0.12) }]}>
               <MaterialIcons name={habit.icon as any} size={32} color={habit.color} />
             </View>
             <View style={styles.headerText}>
@@ -94,7 +95,7 @@ export const ShareCard: React.FC<ShareCardProps> = ({ habit, onClose }) => {
               <Text style={styles.statValue}>{streakInfo.longestStreak}</Text>
               <Text style={styles.statLabel}>Best Streak</Text>
             </View>
-            <View style={[styles.statDivider, { backgroundColor: '#2a2a3e' }]} />
+            <View style={[styles.statDivider, { backgroundColor: '#383838' }]} />
             <View style={styles.statItem}>
               <MaterialIcons name="check-circle" size={24} color="#22c55e" />
               <Text style={styles.statValue}>{streakInfo.totalCompletions}</Text>
@@ -112,7 +113,7 @@ export const ShareCard: React.FC<ShareCardProps> = ({ habit, onClose }) => {
                   style={[
                     styles.gridTile,
                     {
-                      backgroundColor: completed ? habit.color : '#1f1f2e',
+                      backgroundColor: completed ? habit.color : '#2a2a2a',
                     },
                   ]}
                 />
@@ -164,130 +165,137 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    width: 320,
-    borderRadius: 20,
-    padding: 24,
+    width: '100%',
+    maxWidth: 320,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
     overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: SPACING.xxl,
   },
   iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: 52,
+    height: 52,
+    borderRadius: RADIUS.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 16,
+    marginRight: SPACING.lg,
   },
   headerText: {
     flex: 1,
   },
   habitName: {
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 20,
+    fontFamily: FONT.bold,
     color: '#fff',
-    marginBottom: 4,
+    marginBottom: SPACING.xs,
   },
   appName: {
     fontSize: 13,
+    fontFamily: FONT.regular,
     color: '#9ca3af',
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 24,
+    marginBottom: SPACING.xxl,
   },
   statItem: {
     alignItems: 'center',
     flex: 1,
   },
   statDivider: {
-    width: 1,
+    width: StyleSheet.hairlineWidth,
     height: 50,
+    backgroundColor: '#383838',
   },
   statValue: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: 22,
+    fontFamily: FONT.bold,
     color: '#fff',
-    marginTop: 8,
+    marginTop: SPACING.sm,
   },
   statLabel: {
     fontSize: 11,
+    fontFamily: FONT.regular,
     color: '#9ca3af',
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   gridContainer: {
-    marginBottom: 20,
+    marginBottom: SPACING.xl,
   },
   gridTitle: {
     fontSize: 13,
+    fontFamily: FONT.regular,
     color: '#9ca3af',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
     textAlign: 'center',
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 4,
+    gap: 3,
     justifyContent: 'center',
   },
   gridTile: {
-    width: 18,
-    height: 18,
-    borderRadius: 4,
+    width: 16,
+    height: 16,
+    borderRadius: 3,
   },
   rateContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: SPACING.xl,
   },
   rateValue: {
-    fontSize: 36,
-    fontWeight: '700',
+    fontSize: 32,
+    fontFamily: FONT.bold,
   },
   rateLabel: {
     fontSize: 13,
+    fontFamily: FONT.regular,
     color: '#9ca3af',
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   footer: {
     alignItems: 'center',
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#2a2a3e',
+    paddingTop: SPACING.lg,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#383838',
   },
   footerText: {
     fontSize: 13,
+    fontFamily: FONT.regular,
     color: '#9ca3af',
   },
   actions: {
-    marginTop: 20,
-    gap: 12,
+    marginTop: SPACING.xl,
+    gap: SPACING.md,
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: SPACING.xl,
   },
   shareButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 14,
-    gap: 8,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    gap: SPACING.sm,
   },
   shareButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: FONT.semibold,
   },
   closeButton: {
     alignItems: 'center',
-    paddingVertical: 14,
-    borderRadius: 14,
+    paddingVertical: SPACING.md + 2,
+    borderRadius: RADIUS.md,
   },
   closeButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: FONT.semibold,
   },
 });

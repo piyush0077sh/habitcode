@@ -18,9 +18,17 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// Convert hex color to rgba string
+const hexToRgba = (hex: string, alpha: number): string => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const systemColorScheme = useColorScheme();
-  const [themeMode, setThemeModeState] = useState<ThemeMode>('dark');
+  const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
   const [accentColorIndex, setAccentColorIndex] = useState(0);
   const [gradientIndex, setGradientIndex] = useState(0);
 
@@ -83,10 +91,11 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Apply accent color to base colors
   const accent = ACCENT_COLORS[accentColorIndex] || ACCENT_COLORS[0];
   const baseColors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  const accentColor = isDark ? accent.dark : accent.light;
   const colors: ThemeColors = {
     ...baseColors,
-    primary: isDark ? accent.dark : accent.light,
-    primaryLight: isDark ? accent.dark + 'aa' : accent.light + 'aa',
+    primary: accentColor,
+    primaryLight: hexToRgba(accentColor, 0.15),
   };
 
   const gradientColors = GRADIENT_BACKGROUNDS[gradientIndex]?.colors || GRADIENT_BACKGROUNDS[0].colors;
