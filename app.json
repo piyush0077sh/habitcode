@@ -2,7 +2,7 @@
   "expo": {
     "name": "HabitCue",
     "slug": "habitcode",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "A beautiful habit tracking app to build better habits and track your progress. Built by Piyush Singh.",
     "owner": "pie07",
     "orientation": "portrait",
@@ -33,7 +33,7 @@
       [
         "expo-notifications",
         {
-          "color": "#f97316"
+          "color": "#4f46e5"
         }
       ]
     ],
@@ -41,6 +41,12 @@
       "eas": {
         "projectId": "9503a66a-f009-4771-8013-c4c600f29387"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/9503a66a-f009-4771-8013-c4c600f29387"
     }
   }
 }
