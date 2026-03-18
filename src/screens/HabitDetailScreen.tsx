@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -24,6 +25,7 @@ const HabitDetailScreen = ({
   const { colors } = useTheme();
   const { habits, toggleCompletion, archiveHabit, deleteHabit, settings } =
     useHabits();
+  const { width } = useWindowDimensions();
 
   const habit = habits.find((h) => h.id === habitId);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -234,7 +236,7 @@ const HabitDetailScreen = ({
         onRequestClose={() => setShowShareModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background, maxWidth: Math.min(width * 0.95, 500) }]}>
             <ShareCard habit={habit} onClose={() => setShowShareModal(false)} />
           </View>
         </View>
@@ -330,7 +332,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     overflow: 'hidden',
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 500,
   },
 });
 

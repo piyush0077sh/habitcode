@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import ViewShot from 'react-native-view-shot';
@@ -23,8 +24,11 @@ interface ShareCardProps {
 
 export const ShareCard: React.FC<ShareCardProps> = ({ habit, onClose }) => {
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
   const viewShotRef = useRef<ViewShot>(null);
   const streakInfo = calculateStreak(habit);
+  // Responsive card max width: use dynamic value based on available screen width
+  const cardMaxWidth = Math.min(width * 0.95, 600);
 
   const handleShare = async () => {
     try {
@@ -70,7 +74,7 @@ export const ShareCard: React.FC<ShareCardProps> = ({ habit, onClose }) => {
           result: 'tmpfile',
         }}
       >
-        <View style={[styles.card, { backgroundColor: '#1a1a1a' }]}>
+        <View style={[styles.card, { backgroundColor: '#1a1a1a', maxWidth: cardMaxWidth }]}>
           {/* Header */}
           <View style={styles.header}>
             <View style={[styles.iconContainer, { backgroundColor: hexToRgba(habit.color, 0.12) }]}>

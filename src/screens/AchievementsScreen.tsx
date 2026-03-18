@@ -17,7 +17,8 @@ const AchievementsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { colors } = useTheme();
   const { achievements, unlockedCount, totalCount } = useAchievements();
   const { width } = useWindowDimensions();
-  const cardWidth = (width - 44) / 2;
+  // Clamp cardWidth between 100 and calculated width so ultra-small phones don't squish cards
+  const cardWidth = Math.max(100, (width - 44) / 2);
 
   const unlockedAchievements = achievements.filter((a) => a.unlockedAt);
   const lockedAchievements = achievements.filter((a) => !a.unlockedAt);

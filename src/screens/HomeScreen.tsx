@@ -25,7 +25,8 @@ interface HomeScreenProps {
   navigation: any;
 }
 
-const AD_BANNER_HEIGHT = 50;
+// Ad banner height: scale with screen for better proportion on tablets
+const getAdBannerHeight = (screenHeight: number) => Math.max(50, Math.min(80, screenHeight * 0.065));
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { colors } = useTheme();
@@ -33,6 +34,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { isPremium, FREE_HABIT_LIMIT } = usePremium();
   const [selectedCategory, setSelectedCategory] = useState<HabitCategory | 'all'>('all');
   const insets = useSafeAreaInsets();
+  const { height: screenHeight } = useWindowDimensions();
+  const adBannerHeight = getAdBannerHeight(screenHeight);
   const fabScaleAnim = useRef(new Animated.Value(1)).current;
   const fabRotateAnim = useRef(new Animated.Value(0)).current;
 
@@ -73,7 +76,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     outputRange: ['0deg', '90deg'],
   });
 
-  const adHeight = isPremium ? 0 : AD_BANNER_HEIGHT;
+  const adHeight = isPremium ? 0 : adBannerHeight;
   const fabBottom = adHeight + 16;
   const listBottomPadding = adHeight + 80 + 16;
 
@@ -298,7 +301,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 48,
+    paddingHorizontal: SPACING.lg,
   },
   emptyTitle: {
     fontSize: 24,

@@ -108,6 +108,10 @@ const StatsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     };
   }, [activeHabits]);
 
+  // Responsive bar width: calculate based on available width (width - padding - chart gaps)
+  // 7 bars + 6 gaps (spacing=16): (width - 2*xl - 2*xl) / 7 - 16
+  const responsiveBarWidth = Math.max(16, Math.floor((width - 80) / 7 - 16));
+
   // Bar chart data for days of week
   const barChartData = [
     { value: stats.dayOfWeekData[0], label: 'Sun', frontColor: colors.primary },
@@ -202,7 +206,7 @@ const StatsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           <View style={styles.chartWrapper}>
             <BarChart
               data={barChartData}
-              barWidth={28}
+              barWidth={responsiveBarWidth}
               spacing={16}
               roundedTop
               roundedBottom

@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -19,6 +20,9 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   onSelectColor,
 }) => {
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
+  // Calculate responsive button size: assume ~6 buttons per row at minimum on small phone
+  const buttonSize = Math.max(36, (width - SPACING.xl * 2 - SPACING.md * 5) / 6);
 
   return (
     <View style={styles.container}>
@@ -28,8 +32,14 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
           <TouchableOpacity
             key={color}
             style={[
-              styles.colorButton,
-              { backgroundColor: color },
+              {
+                width: buttonSize,
+                height: buttonSize,
+                borderRadius: RADIUS.md,
+                backgroundColor: color,
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
               selectedColor === color && {
                 borderWidth: 3,
                 borderColor: '#fff',
@@ -60,14 +70,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   colorsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.md,
+    columnGap: SPACING.md,
   },
-  colorButton: {
-    width: 44,
-    height: 44,
-    borderRadius: RADIUS.md,
+  colorButton: {  borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
   },

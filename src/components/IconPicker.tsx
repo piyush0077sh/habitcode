@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -21,6 +22,9 @@ const IconPicker: React.FC<IconPickerProps> = ({
   onSelectIcon,
 }) => {
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
+  // Responsive button size: ~5 buttons per row minimum on small phone
+  const buttonSize = Math.max(40, (width - SPACING.xl * 2 - SPACING.sm * 4) / 5);
 
   return (
     <View style={styles.container}>
@@ -34,11 +38,16 @@ const IconPicker: React.FC<IconPickerProps> = ({
               style={[
                 styles.iconButton,
                 {
+                  width: buttonSize,
+                  height: buttonSize,
+                  borderRadius: RADIUS.md,
                   backgroundColor: isSelected
                     ? hexToRgba(selectedColor, 0.12)
                     : colors.surfaceVariant,
                   borderColor: isSelected ? selectedColor : 'transparent',
                   borderWidth: isSelected ? 1.5 : 0,
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 },
               ]}
               onPress={() => onSelectIcon(icon)}
@@ -69,14 +78,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   iconsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.sm,
+    columnGap: SPACING.sm,
   },
-  iconButton: {
-    width: 48,
-    height: 48,
-    borderRadius: RADIUS.md,
+  iconButton: {  borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
   },

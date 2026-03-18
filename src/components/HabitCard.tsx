@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
+  useWindowDimensions,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -21,10 +22,14 @@ interface HabitCardProps {
 
 const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) => {
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
   const last7Days = getLast7Days();
   const today = new Date();
   const isCompletedToday = isDateCompleted(habit, today);
   const streakInfo = calculateStreak(habit);
+  // Responsive icon sizing
+  const iconSize = Math.min(44, Math.max(36, width * 0.11));
+  const checkButtonSize = Math.min(36, Math.max(28, width * 0.09));
 
   // Animation values
   const cardScaleAnim = useRef(new Animated.Value(1)).current;
@@ -124,6 +129,9 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
               styles.iconCircle,
               {
                 backgroundColor: hexToRgba(habit.color, 0.10),
+                width: iconSize,
+                height: iconSize,
+                borderRadius: iconSize / 2,
               },
             ]}
           >
@@ -152,6 +160,9 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
               {
                 backgroundColor: isCompletedToday ? habit.color : 'transparent',
                 borderColor: isCompletedToday ? habit.color : colors.border,
+                width: checkButtonSize,
+                height: checkButtonSize,
+                borderRadius: Math.floor(checkButtonSize / 2),
               },
             ]}
             onPress={handleToggle}
@@ -168,6 +179,9 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onPress, onToggleToday }) 
                       inputRange: [1, 1.5],
                       outputRange: [0.6, 0],
                     }),
+                    width: checkButtonSize,
+                    height: checkButtonSize,
+                    borderRadius: Math.floor(checkButtonSize / 2),
                   },
                 ]}
               />

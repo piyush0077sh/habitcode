@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: SPACING.xl,
   },
   iconContainer: {
     width: 144,
@@ -331,6 +331,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.xxxl + 8,
+    maxWidth: '80%',
+    aspectRatio: 1,
   },
   title: {
     fontSize: 26,
