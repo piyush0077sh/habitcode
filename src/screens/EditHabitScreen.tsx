@@ -23,6 +23,7 @@ import {
 } from '../components';
 import { HabitFrequency, HabitCategory } from '../types';
 import { requestNotificationPermissions } from '../utils/notifications';
+import { FONT, RADIUS, SPACING, hexToRgba } from '../constants/theme';
 
 const EditHabitScreen = ({
   route,
@@ -175,7 +176,7 @@ const EditHabitScreen = ({
                   {
                     backgroundColor:
                       frequency === freq
-                        ? selectedColor + '20'
+                        ? hexToRgba(selectedColor, 0.12)
                         : colors.surfaceVariant,
                     borderColor:
                       frequency === freq ? selectedColor : 'transparent',
@@ -214,7 +215,7 @@ const EditHabitScreen = ({
             <Switch
               value={reminderEnabled}
               onValueChange={setReminderEnabled}
-              trackColor={{ false: colors.border, true: selectedColor + '60' }}
+              trackColor={{ false: colors.border, true: hexToRgba(selectedColor, 0.4) }}
               thumbColor={reminderEnabled ? selectedColor : colors.surface}
             />
           </View>
@@ -274,34 +275,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
+    padding: SPACING.xl,
+    paddingTop: SPACING.lg,
   },
   section: {
-    marginVertical: 12,
+    marginVertical: SPACING.lg,
   },
   sectionTitle: {
     fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 12,
+    fontFamily: FONT.semibold,
+    marginBottom: SPACING.md,
   },
   sectionSubtitle: {
     fontSize: 13,
-    marginTop: 2,
+    fontFamily: FONT.regular,
+    marginTop: 3,
   },
   frequencyOptions: {
     flexDirection: 'row',
-    gap: 10,
+    gap: SPACING.md,
   },
   frequencyButton: {
     flex: 1,
-    padding: 14,
-    borderRadius: 12,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 1.5,
   },
   frequencyText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: FONT.semibold,
   },
   reminderHeader: {
     flexDirection: 'row',
@@ -311,18 +314,18 @@ const styles = StyleSheet.create({
   timeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
-    borderRadius: 12,
-    marginTop: 12,
-    gap: 8,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.md,
+    gap: SPACING.sm,
   },
   timeText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontFamily: FONT.semibold,
   },
   footer: {
-    padding: 20,
-    borderTopWidth: 1,
+    padding: SPACING.xl,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
 });
 

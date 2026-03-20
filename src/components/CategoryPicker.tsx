@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { HabitCategory } from '../types';
-import { HABIT_CATEGORIES } from '../constants/theme';
+import { HABIT_CATEGORIES, FONT, RADIUS, SPACING, hexToRgba } from '../constants/theme';
 
 interface CategoryPickerProps {
   selectedCategory: HabitCategory;
@@ -18,49 +18,54 @@ export const CategoryPicker: React.FC<CategoryPickerProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color: colors.text }]}>Category</Text>
+      <Text style={[styles.label, { color: colors.textSecondary }]}>CATEGORY</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {HABIT_CATEGORIES.map((cat) => (
-          <TouchableOpacity
-            key={cat.id}
-            style={[
-              styles.categoryItem,
-              {
-                backgroundColor:
-                  selectedCategory === cat.id ? cat.color + '20' : colors.surfaceVariant,
-                borderColor: selectedCategory === cat.id ? cat.color : colors.border,
-              },
-            ]}
-            onPress={() => onSelectCategory(cat.id)}
-          >
-            <View
+        {HABIT_CATEGORIES.map((cat) => {
+          const isSelected = selectedCategory === cat.id;
+          return (
+            <TouchableOpacity
+              key={cat.id}
               style={[
-                styles.iconContainer,
-                { backgroundColor: cat.color + '30' },
-              ]}
-            >
-              <MaterialIcons
-                name={cat.icon as any}
-                size={20}
-                color={cat.color}
-              />
-            </View>
-            <Text
-              style={[
-                styles.categoryName,
+                styles.categoryItem,
                 {
-                  color: selectedCategory === cat.id ? cat.color : colors.textSecondary,
+                  backgroundColor: isSelected
+                    ? hexToRgba(cat.color, 0.12)
+                    : colors.surfaceVariant,
+                  borderColor: isSelected ? cat.color : 'transparent',
+                  borderWidth: isSelected ? 1.5 : 0,
                 },
               ]}
+              onPress={() => onSelectCategory(cat.id)}
             >
-              {cat.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <View
+                style={[
+                  styles.iconContainer,
+                  { backgroundColor: hexToRgba(cat.color, 0.15) },
+                ]}
+              >
+                <MaterialIcons
+                  name={cat.icon as any}
+                  size={20}
+                  color={cat.color}
+                />
+              </View>
+              <Text
+                style={[
+                  styles.categoryName,
+                  {
+                    color: isSelected ? cat.color : colors.textSecondary,
+                  },
+                ]}
+              >
+                {cat.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -68,34 +73,35 @@ export const CategoryPicker: React.FC<CategoryPickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    marginBottom: SPACING.xl,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 12,
+    fontSize: 13,
+    fontFamily: FONT.semibold,
+    marginBottom: SPACING.md,
+    letterSpacing: 0.2,
+    textTransform: 'uppercase',
   },
   scrollContent: {
-    gap: 10,
+    gap: SPACING.sm,
   },
   categoryItem: {
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    borderWidth: 2,
-    minWidth: 80,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.lg,
+    borderRadius: RADIUS.md,
+    minWidth: 76,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+    marginBottom: SPACING.xs,
   },
   categoryName: {
     fontSize: 12,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
 });

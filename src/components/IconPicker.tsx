@@ -4,11 +4,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
-import { HABIT_ICONS } from '../constants/theme';
+import { HABIT_ICONS, FONT, RADIUS, SPACING, hexToRgba } from '../constants/theme';
 
 interface IconPickerProps {
   selectedIcon: string;
@@ -22,10 +22,13 @@ const IconPicker: React.FC<IconPickerProps> = ({
   onSelectIcon,
 }) => {
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
+  // Responsive button size: ~5 buttons per row minimum on small phone
+  const buttonSize = Math.max(40, (width - SPACING.xl * 2 - SPACING.sm * 4) / 5);
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color: colors.text }]}>Icon</Text>
+      <Text style={[styles.label, { color: colors.textSecondary }]}>ICON</Text>
       <View style={styles.iconsGrid}>
         {HABIT_ICONS.map((icon) => {
           const isSelected = selectedIcon === icon;
@@ -35,12 +38,16 @@ const IconPicker: React.FC<IconPickerProps> = ({
               style={[
                 styles.iconButton,
                 {
+                  width: buttonSize,
+                  height: buttonSize,
+                  borderRadius: RADIUS.md,
                   backgroundColor: isSelected
-                    ? selectedColor + '18'
+                    ? hexToRgba(selectedColor, 0.12)
                     : colors.surfaceVariant,
                   borderColor: isSelected ? selectedColor : 'transparent',
-                  shadowColor: isSelected ? selectedColor : 'transparent',
-                  shadowOpacity: isSelected ? 0.3 : 0,
+                  borderWidth: isSelected ? 1.5 : 0,
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 },
               ]}
               onPress={() => onSelectIcon(icon)}
@@ -48,7 +55,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
             >
               <MaterialIcons
                 name={icon as any}
-                size={26}
+                size={24}
                 color={isSelected ? selectedColor : colors.textSecondary}
               />
             </TouchableOpacity>
@@ -61,29 +68,21 @@ const IconPicker: React.FC<IconPickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 16,
+    marginVertical: SPACING.lg,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 14,
-    letterSpacing: -0.3,
+    fontSize: 13,
+    fontFamily: FONT.semibold,
+    marginBottom: SPACING.md,
+    letterSpacing: 0.2,
+    textTransform: 'uppercase',
   },
   iconsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
+    columnGap: SPACING.sm,
   },
-  iconButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
+  iconButton: {  borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 6,
-    elevation: 3,
   },
 });
 

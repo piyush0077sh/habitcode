@@ -13,6 +13,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { usePremium } from '../context/PremiumContext';
 import { Logo } from '../components';
+import { FONT, RADIUS, SPACING, SHADOW, hexToRgba } from '../constants/theme';
 
 interface PremiumScreenProps {
   navigation: any;
@@ -187,7 +188,7 @@ const PremiumScreen: React.FC<PremiumScreenProps> = ({ navigation }) => {
               key={index}
               style={[styles.featureRow, { backgroundColor: colors.surface }]}
             >
-              <View style={[styles.featureIcon, { backgroundColor: colors.primary + '20' }]}>
+              <View style={[styles.featureIcon, { backgroundColor: hexToRgba(colors.primary, 0.12) }]}>
                 <MaterialIcons
                   name={feature.icon as any}
                   size={24}
@@ -269,44 +270,38 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
+    padding: SPACING.xl,
     paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 32,
-  },
-  iconGlow: {
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 10,
-    marginBottom: 16,
+    marginBottom: SPACING.xxxl,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 26,
+    fontFamily: FONT.bold,
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 16,
-    marginTop: 6,
+    fontSize: 15,
+    fontFamily: FONT.regular,
+    marginTop: SPACING.xs,
   },
   featuresContainer: {
-    gap: 10,
-    marginBottom: 28,
+    gap: SPACING.sm,
+    marginBottom: SPACING.xxl,
   },
   featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    gap: 14,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    gap: SPACING.md,
   },
   featureIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
+    width: 44,
+    height: 44,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -315,10 +310,11 @@ const styles = StyleSheet.create({
   },
   featureTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: FONT.semibold,
   },
   featureDesc: {
     fontSize: 12,
+    fontFamily: FONT.regular,
     marginTop: 2,
   },
   featureComparison: {
@@ -328,114 +324,113 @@ const styles = StyleSheet.create({
   },
   freeLabel: {
     fontSize: 10,
-    fontWeight: '600',
+    fontFamily: FONT.semibold,
   },
   premiumLabel: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: FONT.bold,
   },
   pricingCard: {
-    padding: 24,
-    borderRadius: 20,
+    padding: SPACING.xxl,
+    borderRadius: RADIUS.xl,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: SPACING.xl,
   },
   priceLabel: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: FONT.semibold,
     letterSpacing: 1,
   },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 6,
-    marginVertical: 8,
+    gap: SPACING.xs,
+    marginVertical: SPACING.sm,
   },
   price: {
-    fontSize: 48,
-    fontWeight: '800',
+    fontSize: 40,
+    fontFamily: FONT.bold,
   },
   pricePeriod: {
     fontSize: 16,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
   priceNote: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: FONT.semibold,
   },
   purchaseButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFD700',
-    paddingVertical: 18,
-    borderRadius: 16,
-    gap: 10,
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 6,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    gap: SPACING.sm,
+    ...SHADOW.md,
   },
   purchaseText: {
     color: '#1a1a1a',
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 17,
+    fontFamily: FONT.bold,
   },
   restoreButton: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: SPACING.lg,
   },
   restoreText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: FONT.semibold,
   },
   footer: {
     fontSize: 12,
+    fontFamily: FONT.regular,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: SPACING.sm,
   },
   // Premium active styles
   premiumActiveContent: {
-    padding: 24,
+    padding: SPACING.xl,
     alignItems: 'center',
   },
   premiumBadge: {
     marginTop: 40,
-    marginBottom: 20,
+    marginBottom: SPACING.xl,
   },
   premiumTitle: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 26,
+    fontFamily: FONT.bold,
   },
   premiumSubtitle: {
-    fontSize: 16,
-    marginTop: 8,
+    fontSize: 15,
+    fontFamily: FONT.regular,
+    marginTop: SPACING.sm,
   },
   purchaseDate: {
     fontSize: 14,
-    marginTop: 4,
+    fontFamily: FONT.regular,
+    marginTop: SPACING.xs,
   },
   featuresUnlocked: {
     width: '100%',
-    padding: 20,
-    borderRadius: 20,
-    marginTop: 32,
-    gap: 14,
+    padding: SPACING.xl,
+    borderRadius: RADIUS.xl,
+    marginTop: SPACING.xxxl,
+    gap: SPACING.md,
   },
   unlockedTitle: {
     fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 8,
+    fontFamily: FONT.bold,
+    marginBottom: SPACING.sm,
   },
   unlockedFeature: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: SPACING.md,
   },
   unlockedText: {
     fontSize: 15,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
 });
 

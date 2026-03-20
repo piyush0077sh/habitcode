@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { HabitCategory } from '../types';
-import { HABIT_CATEGORIES } from '../constants/theme';
+import { HABIT_CATEGORIES, FONT, RADIUS, SPACING } from '../constants/theme';
 
 interface CategoryFilterProps {
   selectedCategory: HabitCategory | 'all';
@@ -90,23 +90,23 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 8,
+    marginVertical: SPACING.sm,
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    gap: 8,
+    paddingHorizontal: SPACING.lg,
+    gap: SPACING.sm,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    gap: 6,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
+    borderWidth: 0,
+    gap: SPACING.xs,
   },
   chipText: {
     fontSize: 13,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
 });

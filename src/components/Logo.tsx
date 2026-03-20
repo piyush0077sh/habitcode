@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { FONT, SHADOW } from '../constants/theme';
 
 interface LogoProps {
   size?: 'small' | 'medium' | 'large';
@@ -28,7 +29,7 @@ const Logo: React.FC<LogoProps> = ({ size = 'medium', showText = true }) => {
 
   return (
     <View style={styles.container}>
-      {/* Icon container – gradients are behind the icon via render order */}
+      {/* Icon container – gradients behind, icon on top via render order */}
       <View
         style={[
           styles.iconContainer,
@@ -36,14 +37,16 @@ const Logo: React.FC<LogoProps> = ({ size = 'medium', showText = true }) => {
             width: dimensions.container,
             height: dimensions.container,
             borderRadius: dimensions.container * 0.28,
+            backgroundColor: '#7c3aed',
           },
+          SHADOW.lg,
         ]}
       >
         {/* Background gradient layers (rendered first = behind the icon) */}
         <View style={[styles.gradientBg, styles.gradientPurple]} />
         <View style={[styles.gradientBg, styles.gradientPink]} />
 
-        {/* Icon rendered last so it always paints on top */}
+        {/* Icon wrapper is last child – always paints on top, no zIndex needed */}
         <View style={styles.iconWrapper}>
           <MaterialIcons
             name="track-changes"
@@ -77,13 +80,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#7c3aed',
     overflow: 'hidden',
-    shadowColor: '#7c3aed',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
   },
   gradientBg: {
     position: 'absolute',
@@ -99,7 +96,7 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '45deg' }, { scale: 1.5 }],
     top: '50%',
   },
-  // Wrapper ensures the icon is the last painted element (above gradients)
+  // Last child in the tree – always renders above the gradients
   iconWrapper: {
     position: 'absolute',
     alignItems: 'center',
@@ -108,7 +105,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   title: {
-    fontWeight: '800',
+    fontFamily: FONT.bold,
     letterSpacing: -0.5,
   },
 });

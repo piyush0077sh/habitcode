@@ -22,7 +22,7 @@ import {
   CategoryPicker,
 } from '../components';
 import { NewHabit, HabitFrequency, HabitCategory } from '../types';
-import { HABIT_COLORS, HABIT_ICONS } from '../constants/theme';
+import { HABIT_COLORS, HABIT_ICONS, FONT, RADIUS, SPACING, hexToRgba } from '../constants/theme';
 import { requestNotificationPermissions } from '../utils/notifications';
 
 interface AddHabitScreenProps {
@@ -35,7 +35,7 @@ const AddHabitScreen: React.FC<AddHabitScreenProps> = ({ navigation }) => {
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [selectedColor, setSelectedColor] = useState(HABIT_COLORS[10]);
+  const [selectedColor, setSelectedColor] = useState(HABIT_COLORS[0]);
   const [selectedIcon, setSelectedIcon] = useState(HABIT_ICONS[0]);
   const [selectedCategory, setSelectedCategory] = useState<HabitCategory>('personal');
   const [frequency, setFrequency] = useState<HabitFrequency>('daily');
@@ -150,7 +150,7 @@ const AddHabitScreen: React.FC<AddHabitScreenProps> = ({ navigation }) => {
                   {
                     backgroundColor:
                       frequency === freq
-                        ? selectedColor + '20'
+                        ? hexToRgba(selectedColor, 0.12)
                         : colors.surfaceVariant,
                     borderColor:
                       frequency === freq ? selectedColor : 'transparent',
@@ -189,7 +189,7 @@ const AddHabitScreen: React.FC<AddHabitScreenProps> = ({ navigation }) => {
             <Switch
               value={reminderEnabled}
               onValueChange={setReminderEnabled}
-              trackColor={{ false: colors.border, true: selectedColor + '60' }}
+              trackColor={{ false: colors.border, true: hexToRgba(selectedColor, 0.4) }}
               thumbColor={reminderEnabled ? selectedColor : colors.surface}
             />
           </View>
@@ -246,37 +246,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
-    paddingTop: 16,
+    padding: SPACING.xl,
+    paddingTop: SPACING.lg,
   },
   section: {
-    marginVertical: 16,
+    marginVertical: SPACING.lg,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 14,
-    letterSpacing: -0.3,
+    fontSize: 15,
+    fontFamily: FONT.semibold,
+    marginBottom: SPACING.md,
   },
   sectionSubtitle: {
     fontSize: 13,
+    fontFamily: FONT.regular,
     marginTop: 3,
-    opacity: 0.8,
   },
   frequencyOptions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: SPACING.md,
   },
   frequencyButton: {
     flex: 1,
-    padding: 16,
-    borderRadius: 14,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 1.5,
   },
   frequencyText: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: FONT.semibold,
   },
   reminderHeader: {
     flexDirection: 'row',
@@ -286,18 +285,18 @@ const styles = StyleSheet.create({
   timeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 14,
-    marginTop: 14,
-    gap: 10,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.md,
+    gap: SPACING.sm,
   },
   timeText: {
-    fontSize: 17,
-    fontWeight: '600',
+    fontSize: 16,
+    fontFamily: FONT.semibold,
   },
   footer: {
-    padding: 24,
-    borderTopWidth: 1,
+    padding: SPACING.xl,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
 });
 

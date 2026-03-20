@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
-import { STORAGE_KEYS } from '../constants/theme';
+import { STORAGE_KEYS, FONT, RADIUS, SPACING, SHADOW, hexToRgba } from '../constants/theme';
 
 interface OnboardingScreenProps {
   navigation: any;
@@ -48,7 +48,7 @@ const onboardingData: OnboardingItem[] = [
     icon: 'grid-view',
     title: 'See the Big Picture',
     description: 'Get your completions visualized in a beautiful tile grid',
-    color: '#f97316',
+    color: '#818cf8',
   },
   {
     id: '4',
@@ -92,14 +92,33 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+  const buttonScaleAnim = useRef(new Animated.Value(1)).current;
 
   // Reactive – updates on orientation change and web viewport resize
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
 
-  // Adapt icon size and text size to screen dimensions
-  const iconContainerSize = Math.min(width * 0.38, 160);
+  // Adapt sizes to screen width
+  const iconContainerSize = Math.min(width * 0.38, 144);
   const titleFontSize = Math.min(26, width * 0.065);
   const descFontSize = Math.min(17, width * 0.042);
+
+  const handleButtonPressIn = useCallback(() => {
+    Animated.spring(buttonScaleAnim, {
+      toValue: 0.93,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  }, [buttonScaleAnim]);
+
+  const handleButtonPressOut = useCallback(() => {
+    Animated.spring(buttonScaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+      bounciness: 10,
+    }).start();
+  }, [buttonScaleAnim]);
 
   const handleComplete = async () => {
     await AsyncStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETE, 'true');
@@ -142,13 +161,13 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
     });
 
     return (
-      // Use the current `width` from useWindowDimensions so slides are always full-width
+      // Uses reactive `width` so slides are always exactly full-width
       <View style={[styles.slide, { width }]}>
         <Animated.View
           style={[
             styles.iconContainer,
             {
-              backgroundColor: item.color + '20',
+              backgroundColor: hexToRgba(item.color, 0.12),
               width: iconContainerSize,
               height: iconContainerSize,
               borderRadius: iconContainerSize / 2,
@@ -236,7 +255,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
           )}
         </View>
 
-        {/* Content – getItemLayout prevents scroll misalignment */}
+        {/* FlatList – getItemLayout prevents scroll misalignment on resize */}
         <Animated.FlatList
           ref={flatListRef}
           data={onboardingData}
@@ -267,20 +286,24 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
 
         {/* Button */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.primary }]}
-            onPress={handleNext}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.buttonText}>
-              {currentIndex === onboardingData.length - 1 ? 'Get Started' : 'Continue'}
-            </Text>
-            <MaterialIcons
-              name={currentIndex === onboardingData.length - 1 ? 'check' : 'arrow-forward'}
-              size={24}
-              color="#fff"
-            />
-          </TouchableOpacity>
+          <Animated.View style={{ transform: [{ scale: buttonScaleAnim }] }}>
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: colors.primary }, SHADOW.md]}
+              onPress={handleNext}
+              onPressIn={handleButtonPressIn}
+              onPressOut={handleButtonPressOut}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.buttonText}>
+                {currentIndex === onboardingData.length - 1 ? 'Get Started' : 'Continue'}
+              </Text>
+              <MaterialIcons
+                name={currentIndex === onboardingData.length - 1 ? 'check' : 'arrow-forward'}
+                size={24}
+                color="#fff"
+              />
+            </TouchableOpacity>
+          </Animated.View>
         </View>
       </SafeAreaView>
     </LinearGradient>
@@ -298,74 +321,70 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingHorizontal: SPACING.xxl,
+    paddingTop: SPACING.lg,
   },
   logoContainer: {
     flex: 1,
   },
   logoText: {
-    fontWeight: '700',
+    fontFamily: FONT.bold,
     letterSpacing: -0.5,
   },
   skipText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontFamily: FONT.medium,
   },
   slide: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: SPACING.xxl,
   },
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 36,
+    marginBottom: SPACING.xxxl + SPACING.sm,
   },
   title: {
-    fontWeight: '700',
+    fontFamily: FONT.bold,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: SPACING.lg,
     letterSpacing: -0.5,
   },
   description: {
+    fontFamily: FONT.regular,
     textAlign: 'center',
     lineHeight: 26,
-    paddingHorizontal: 20,
+    paddingHorizontal: SPACING.xl,
   },
   dotsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 24,
+    paddingVertical: SPACING.xxl + SPACING.sm,
   },
   dot: {
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
+    height: 6,
+    borderRadius: 3,
+    marginHorizontal: 3,
   },
   buttonContainer: {
-    paddingHorizontal: 24,
-    paddingBottom: 32,
+    paddingHorizontal: SPACING.xxl,
+    paddingBottom: SPACING.xxxl,
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    borderRadius: 16,
-    gap: 8,
-    shadowColor: '#7c3aed',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    gap: SPACING.sm,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontFamily: FONT.semibold,
   },
 });
 

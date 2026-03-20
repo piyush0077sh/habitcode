@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { usePremium } from '../context/PremiumContext';
+import { FONT, RADIUS, SPACING } from '../constants/theme';
 
 interface AdBannerProps {
   size?: 'banner' | 'largeBanner' | 'mediumRectangle';
@@ -59,24 +60,25 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    borderTopWidth: 1,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   adContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: SPACING.sm,
   },
   adLabel: {
     fontSize: 10,
-    fontWeight: '700',
-    paddingHorizontal: 6,
+    fontFamily: FONT.semibold,
+    paddingHorizontal: SPACING.xs + 2,
     paddingVertical: 2,
-    borderRadius: 4,
-    backgroundColor: 'rgba(150, 150, 150, 0.2)',
+    borderRadius: RADIUS.sm / 2,
+    backgroundColor: 'rgba(120, 120, 120, 0.12)',
     overflow: 'hidden',
   },
   adText: {
     fontSize: 12,
+    fontFamily: FONT.regular,
   },
 });
 
