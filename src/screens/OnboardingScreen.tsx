@@ -3,10 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
   FlatList,
   Animated,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -14,8 +14,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 import { STORAGE_KEYS } from '../constants/theme';
-
-const { width, height } = Dimensions.get('window');
 
 interface OnboardingScreenProps {
   navigation: any;
@@ -95,6 +93,14 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
   const flatListRef = useRef<FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
 
+  // Reactive – updates on orientation change and web viewport resize
+  const { width, height } = useWindowDimensions();
+
+  // Adapt icon size and text size to screen dimensions
+  const iconContainerSize = Math.min(width * 0.38, 160);
+  const titleFontSize = Math.min(26, width * 0.065);
+  const descFontSize = Math.min(17, width * 0.042);
+
   const handleComplete = async () => {
     await AsyncStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETE, 'true');
     onComplete();
@@ -136,12 +142,16 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
     });
 
     return (
+      // Use the current `width` from useWindowDimensions so slides are always full-width
       <View style={[styles.slide, { width }]}>
         <Animated.View
           style={[
             styles.iconContainer,
             {
               backgroundColor: item.color + '20',
+              width: iconContainerSize,
+              height: iconContainerSize,
+              borderRadius: iconContainerSize / 2,
               transform: [{ scale }],
               opacity,
             },
@@ -149,12 +159,14 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
         >
           <MaterialIcons
             name={item.icon as any}
-            size={80}
+            size={iconContainerSize * 0.5}
             color={item.color}
           />
         </Animated.View>
-        <Text style={[styles.title, { color: item.color }]}>{item.title}</Text>
-        <Text style={[styles.description, { color: colors.textSecondary }]}>
+        <Text style={[styles.title, { color: item.color, fontSize: titleFontSize }]}>
+          {item.title}
+        </Text>
+        <Text style={[styles.description, { color: colors.textSecondary, fontSize: descFontSize }]}>
           {item.description}
         </Text>
       </View>
@@ -210,7 +222,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <Text style={[styles.logoText, { color: colors.text }]}>
+            <Text style={[styles.logoText, { color: colors.text, fontSize: Math.min(28, width * 0.07) }]}>
               Welcome to{' '}
               <Text style={{ color: colors.primary }}>HabitCue</Text>
             </Text>
@@ -224,7 +236,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
           )}
         </View>
 
-        {/* Content */}
+        {/* Content – getItemLayout prevents scroll misalignment */}
         <Animated.FlatList
           ref={flatListRef}
           data={onboardingData}
@@ -234,6 +246,11 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation, onCompl
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           bounces={false}
+          getItemLayout={(_, index) => ({
+            length: width,
+            offset: width * index,
+            index,
+          })}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { x: scrollX } } }],
             { useNativeDriver: true }
@@ -288,7 +305,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoText: {
-    fontSize: 28,
     fontWeight: '700',
     letterSpacing: -0.5,
   },
@@ -303,22 +319,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   iconContainer: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 40,
+    marginBottom: 36,
   },
   title: {
-    fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 16,
     letterSpacing: -0.5,
   },
   description: {
-    fontSize: 17,
     textAlign: 'center',
     lineHeight: 26,
     paddingHorizontal: 20,
@@ -327,7 +338,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 30,
+    paddingVertical: 24,
   },
   dot: {
     height: 8,

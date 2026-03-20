@@ -19,6 +19,8 @@ const Logo: React.FC<LogoProps> = ({ size = 'medium', showText = true }) => {
         return { icon: 32, container: 56, fontSize: 22, gap: 12 };
       case 'large':
         return { icon: 48, container: 80, fontSize: 32, gap: 16 };
+      default:
+        return { icon: 32, container: 56, fontSize: 22, gap: 12 };
     }
   };
 
@@ -26,6 +28,7 @@ const Logo: React.FC<LogoProps> = ({ size = 'medium', showText = true }) => {
 
   return (
     <View style={styles.container}>
+      {/* Icon container – gradients are behind the icon via render order */}
       <View
         style={[
           styles.iconContainer,
@@ -36,18 +39,20 @@ const Logo: React.FC<LogoProps> = ({ size = 'medium', showText = true }) => {
           },
         ]}
       >
-        {/* Background gradient effect */}
+        {/* Background gradient layers (rendered first = behind the icon) */}
         <View style={[styles.gradientBg, styles.gradientPurple]} />
         <View style={[styles.gradientBg, styles.gradientPink]} />
-        
-        {/* Icon */}
-        <MaterialIcons
-          name="track-changes"
-          size={dimensions.icon}
-          color="#fff"
-        />
+
+        {/* Icon rendered last so it always paints on top */}
+        <View style={styles.iconWrapper}>
+          <MaterialIcons
+            name="track-changes"
+            size={dimensions.icon}
+            color="#fff"
+          />
+        </View>
       </View>
-      
+
       {showText && (
         <View style={{ marginLeft: dimensions.gap }}>
           <Text
@@ -93,6 +98,14 @@ const styles = StyleSheet.create({
     opacity: 0.3,
     transform: [{ rotate: '45deg' }, { scale: 1.5 }],
     top: '50%',
+  },
+  // Wrapper ensures the icon is the last painted element (above gradients)
+  iconWrapper: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
   },
   title: {
     fontWeight: '800',

@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -13,10 +13,11 @@ import { useTheme } from '../context/ThemeContext';
 import { useHabits } from '../context/HabitContext';
 import { formatDate } from '../utils/dateUtils';
 
-const { width } = Dimensions.get('window');
+
 
 const StatsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
   const { activeHabits, habits } = useHabits();
 
   // Calculate statistics
@@ -202,8 +203,9 @@ const StatsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           <View style={styles.chartWrapper}>
             <BarChart
               data={barChartData}
-              barWidth={28}
-              spacing={16}
+              width={Math.max(width - 100, 200)}
+              barWidth={Math.max(20, Math.min(32, (width - 120) / 10))}
+              spacing={Math.max(8, (width - 180) / 14)}
               roundedTop
               roundedBottom
               hideRules
@@ -307,7 +309,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statCard: {
-    width: (width - 44) / 2,
+    flex: 1,
+    minWidth: 130,
     padding: 16,
     borderRadius: 16,
     alignItems: 'center',
