@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, Animated, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons } from '@expo/vector-icons';
 import {
   useFonts,
   Inter_400Regular,
@@ -19,7 +17,7 @@ import { HabitProvider } from './src/context/HabitContext';
 import { PremiumProvider } from './src/context/PremiumContext';
 import { AchievementProvider } from './src/context/AchievementContext';
 import { checkForUpdates } from './src/utils/updateChecker';
-import { STORAGE_KEYS, FONT, SHADOW } from './src/constants/theme';
+import { STORAGE_KEYS, FONT } from './src/constants/theme';
 import {
   HomeScreen,
   AddHabitScreen,
@@ -34,118 +32,6 @@ import {
 import PremiumScreen from './src/screens/PremiumScreen';
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-
-const TAB_ICONS: Record<string, keyof typeof MaterialIcons.glyphMap> = {
-  HomeTab: 'home',
-  StatsTab: 'bar-chart',
-  AchievementsTab: 'emoji-events',
-  LeaderboardTab: 'groups',
-  SettingsTab: 'settings',
-};
-
-const BottomTabs: React.FC = () => {
-  const { colors, isDark } = useTheme();
-
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: true,
-        headerStyle: {
-          backgroundColor: colors.background,
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-        headerTitleStyle: {
-          color: colors.text,
-          fontSize: 20,
-          fontFamily: FONT.semibold,
-        },
-        headerTintColor: colors.text,
-        tabBarIcon: ({ color }) => (
-          <MaterialIcons
-            name={TAB_ICONS[route.name] || 'circle'}
-            size={22}
-            color={color}
-          />
-        ),
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: 'transparent',
-          borderTopWidth: 0,
-          height: 56,
-          paddingBottom: 6,
-          paddingTop: 6,
-          ...SHADOW.sm,
-        },
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontFamily: FONT.medium,
-          letterSpacing: 0.2,
-        },
-        tabBarButton: (props) => {
-          const scaleValue = React.useRef(new Animated.Value(1)).current;
-          return (
-            <Animated.View style={{ flex: 1, transform: [{ scale: scaleValue }] }}>
-              <TouchableOpacity
-                {...(props as any)}
-                activeOpacity={0.8}
-                onPressIn={(e: any) => {
-                  Animated.spring(scaleValue, {
-                    toValue: 0.85,
-                    useNativeDriver: true,
-                    speed: 50,
-                    bounciness: 4,
-                  }).start();
-                  (props as any).onPressIn?.(e);
-                }}
-                onPressOut={(e: any) => {
-                  Animated.spring(scaleValue, {
-                    toValue: 1,
-                    useNativeDriver: true,
-                    speed: 30,
-                    bounciness: 10,
-                  }).start();
-                  (props as any).onPressOut?.(e);
-                }}
-                style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-              />
-            </Animated.View>
-          );
-        },
-      })}
-    >
-      <Tab.Screen
-        name="HomeTab"
-        component={HomeScreen}
-        options={{ tabBarLabel: 'Home', headerShown: false }}
-      />
-      <Tab.Screen
-        name="StatsTab"
-        component={StatsScreen}
-        options={{ tabBarLabel: 'Stats', headerTitle: 'Statistics' }}
-      />
-      <Tab.Screen
-        name="AchievementsTab"
-        component={AchievementsScreen}
-        options={{ tabBarLabel: 'Badges', headerTitle: 'Achievements' }}
-      />
-      <Tab.Screen
-        name="LeaderboardTab"
-        component={LeaderboardScreen}
-        options={{ tabBarLabel: 'Friends', headerShown: false }}
-      />
-      <Tab.Screen
-        name="SettingsTab"
-        component={SettingsScreen}
-        options={{ tabBarLabel: 'Settings', headerTitle: 'Settings' }}
-      />
-    </Tab.Navigator>
-  );
-};
 
 interface AppNavigatorProps {
   showOnboarding: boolean;
@@ -197,11 +83,36 @@ const AppNavigator: React.FC<AppNavigatorProps> = ({ showOnboarding, onOnboardin
             },
           }}
         >
+          {/* Home – no header, it has its own custom header */}
           <Stack.Screen
-            name="MainTabs"
-            component={BottomTabs}
+            name="Home"
+            component={HomeScreen}
             options={{ headerShown: false }}
           />
+
+          {/* Secondary screens – navigated to from the header buttons */}
+          <Stack.Screen
+            name="Stats"
+            component={StatsScreen}
+            options={{ title: 'Statistics' }}
+          />
+          <Stack.Screen
+            name="Achievements"
+            component={AchievementsScreen}
+            options={{ title: 'Achievements' }}
+          />
+          <Stack.Screen
+            name="Leaderboard"
+            component={LeaderboardScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Settings"
+            component={SettingsScreen}
+            options={{ title: 'Settings' }}
+          />
+
+          {/* Modal screens */}
           <Stack.Screen
             name="AddHabit"
             component={AddHabitScreen}
@@ -213,9 +124,7 @@ const AppNavigator: React.FC<AppNavigatorProps> = ({ showOnboarding, onOnboardin
           <Stack.Screen
             name="HabitDetail"
             component={HabitDetailScreen}
-            options={{
-              title: 'Habit Details',
-            }}
+            options={{ title: 'Habit Details' }}
           />
           <Stack.Screen
             name="EditHabit"
@@ -266,7 +175,6 @@ export default function App() {
     setShowOnboarding(false);
   };
 
-  // Still loading onboarding status or fonts
   if (showOnboarding === null || !fontsLoaded) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f0f0f' }}>
@@ -281,9 +189,9 @@ export default function App() {
         <PremiumProvider>
           <HabitProvider>
             <AchievementProvider>
-              <AppNavigator 
-                showOnboarding={showOnboarding} 
-                onOnboardingComplete={handleOnboardingComplete} 
+              <AppNavigator
+                showOnboarding={showOnboarding}
+                onOnboardingComplete={handleOnboardingComplete}
               />
             </AchievementProvider>
           </HabitProvider>
